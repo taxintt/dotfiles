@@ -1,0 +1,27 @@
+add_newline = false
+scan_timeout = 30
+
+[directory]
+style = "bold cyan"
+truncation_length = 5
+
+[custom.arch]
+command = "uname -m"
+when = """ test $(uname -m) = "x86_64" """
+style = "bold yellow"
+format = "[$output]($style)"
+
+[cmd_duration]
+disabled = false
+show_milliseconds = true
+
+[gcloud]
+format = 'on [$symbol$project/$account(@$domain)(\($region\))]($style) '
+
+[status]
+disabled = false
+format = "[$symbol $status]($style) "
+
+[time]
+disabled = false
+format = '🕙[\[ $time \]]($style) '

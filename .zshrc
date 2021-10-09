@@ -130,3 +130,6 @@ gshow() {
                 {}
 FZF-EOF"
 }
+
+# starship
+eval "$(starship init zsh)"

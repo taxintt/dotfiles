@@ -62,10 +62,15 @@ if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/path.zsh.inc' ]; the
 if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 export PATH="/usr/local/opt/helm@2/bin:$PATH"
 
-# pyenv
+# pyenv setting
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+# nodenv setting
+eval "$(nodenv init -)"
 
 # fzf
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
@@ -130,3 +135,6 @@ gshow() {
                 {}
 FZF-EOF"
 }
+
+# starship
+eval "$(starship init zsh)"

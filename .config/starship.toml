@@ -1,0 +1,6 @@
+add_newline = false
+
+[character]
+symbol = "🌱 "
+[directory]
+style = "bold cyan"

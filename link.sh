@@ -12,7 +12,7 @@ do
 			;;
 		*)
 			echo "$CURRENT_DIR/$dotfile"
-			( cd && ln -s -v $base/$dotfile ) || true
+			( cd && ln -s -v $CURRENT_DIR/$dotfile ) || true
 			;;
 	esac
 done

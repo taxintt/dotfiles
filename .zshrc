@@ -5,7 +5,7 @@ alias cp='cp -i'
 
 # git
 # https://gist.github.com/juno/5546198
-export PATH=/usr/local/bin/git:$PATH
+# export PATH=/usr/local/bin/git:$PATH
 fpath=($(brew --prefix)/share/zsh-completions $fpath)
 autoload -U compinit
 compinit -u
@@ -30,11 +30,6 @@ setopt list_packed
 setopt correct
 SPROMPT="correct: $RED%R$DEFAULT -> $GREEN%r$DEFAULT ? [Yes/No/Abort/Edit] => "
 
-# Prezto.
-if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
-fi
-
 # Customize to your needs...
 ## terraform
 alias tf='terraform'
@@ -52,15 +47,15 @@ alias k='kubectl'
 alias zenn='npx zenn'
 
 #added by golang
-export GOPATH=$HOME/go
-export GOROOT=/usr/local/opt/go/libexec
-export PATH=$PATH:$GOPATH/bin
-export PATH=$PATH:$GOROOT/bin
+# export GOPATH=$HOME/go
+# export GOROOT=/usr/local/opt/go/libexec
+# export PATH=$PATH:$GOPATH/bin
+# export PATH=$PATH:$GOROOT/bin
 
 # Google Cloud SDK.
-if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-export PATH="/usr/local/opt/helm@2/bin:$PATH"
+# if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+# if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+# export PATH="/usr/local/opt/helm@2/bin:$PATH"
 
 # pyenv setting
 export PYENV_ROOT="$HOME/.pyenv"
@@ -76,11 +71,6 @@ eval "$(nodenv init -)"
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
 
-# vagrant
-# vs(){
-#   #List all vagrant boxes available in the system including its status, and try to access the selected one via ssh
-#   cd $(cat ~/.vagrant.d/data/machine-index/index | jq '.machines[] | {name, vagrantfile_path, state}' | jq '.name + "," + .state  + "," + .vagrantfile_path'| sed 's/^"\(.*\)"$/\1/'| column -s, -t | sort -rk 2 | fzf | awk '{print $3}'); vagrant ssh
-# }
 
 # docker
 # Select a docker container to start and attach to

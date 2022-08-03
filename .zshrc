@@ -57,15 +57,28 @@ alias zenn='npx zenn'
 # if [ -f '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nishikawatakushi/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 # export PATH="/usr/local/opt/helm@2/bin:$PATH"
 
-# pyenv setting
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
+# brew setting
+if [ "$(uname -m)" = "arm64" ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  export PATH="/opt/homebrew/bin:$PATH"
+else
+  eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-# nodenv setting
-eval "$(nodenv init -)"
+# pyenv setting
+if [ "$(uname -m)" = "arm64" ]; then
+  export PYENV_ROOT="$HOME/.pyenv_arm64"
+  export PATH="$HOME/.pyenv_arm64/bin:$PATH"
+else
+  export PYENV_ROOT="$HOME/.pyenv_x86"
+  export PATH="$HOME/.pyenv_x86/bin:$PATH"
+fi
+eval "$(pyenv init -)"
+eval "$(pyenv init --path)"
+
+# nodebrew setting
+export PATH=$HOME/.nodebrew/current/bin:$PATH
+
 
 # fzf
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
@@ -128,3 +141,17 @@ FZF-EOF"
 
 # starship
 eval "$(starship init zsh)"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+
+# fd - cd to selected directory
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}

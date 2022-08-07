@@ -139,15 +139,6 @@ gshow() {
 FZF-EOF"
 }
 
-# starship
-eval "$(starship init zsh)"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
 # fd - cd to selected directory
 fd() {
   local dir
@@ -155,3 +146,9 @@ fd() {
                   -o -type d -print 2> /dev/null | fzf +m) &&
   cd "$dir"
 }
+
+# starship
+eval "$(starship init zsh)"
+
+# asdf
+. /opt/homebrew/opt/asdf/libexec/asdf.sh

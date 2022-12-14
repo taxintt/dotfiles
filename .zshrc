@@ -126,5 +126,15 @@ gshow() {
 FZF-EOF"
 }
 
+# fcd - find directory below current directory and cd
+fcd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+# z
+. `brew --prefix`/etc/profile.d/z.sh
+
 # starship
 eval "$(starship init zsh)"

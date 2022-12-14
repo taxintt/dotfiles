@@ -13,6 +13,9 @@ brew: ## install from homebrew
 	fi && \
 	brew bundle install --no-upgrade;
 
+brew-dump: ## dump to Brewfile
+	brew bundle dump -f
+
 link: ## make symlinks
 	./link.sh
 

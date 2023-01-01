@@ -18,6 +18,3 @@ brew-dump: ## dump to Brewfile
 
 link: ## make symlinks
 	./link.sh
-
-iterm2: ## setup iterm2
-	./iterm2/init.sh

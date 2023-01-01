@@ -5,11 +5,23 @@ symbol = "🌱 "
 [directory]
 style = "bold cyan"
 
-[gcloud]
-format = 'on [$symbol$account(@$domain)(\($project\))]($style) '
-
 [custom.arch]
 command = "uname -m"
 when = """ test $(uname -m) = "x86_64" """
 style = "bold yellow"
 format = "[$output]($style)"
+
+[cmd_duration]
+disabled = false
+show_milliseconds = true
+
+[gcloud]
+format = 'on [$symbol$project/$account(@$domain)(\($region\))]($style) '
+
+[status]
+disabled = false
+format = "[$symbol $status]($style) "
+
+[time]
+disabled = false
+format = '🕙[\[ $time \]]($style) '

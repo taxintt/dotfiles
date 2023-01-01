@@ -16,6 +16,7 @@ make_symlink(){
 		_tofilename=$2
 	fi
 	ln -hvfs "$CURRENT_DIR/$_fromfilename" "$HOME/$_tofilename"
+	echo ' '
 }
 
 # make symbolic link

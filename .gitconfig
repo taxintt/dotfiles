@@ -1,0 +1,98 @@
+[alias] 
+	c = commit -m
+	fpush = push --force
+	s = status
+	stats = status 
+	sclone = clone --depth=1
+	amend = commit --amend --all --no-edit
+	undocommit = reset HEAD~
+	hreset = reset --hard
+	co = checkout
+	df = diff --color --color-words --abbrev
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit
+	cherrypick = cherry-pick
+
+	# Essentially GitHub's compare view: show all 'ahead' changes (incl working tree) vs the merge-base
+	diffbranch = !"git diff $(git diffbase)"
+
+	# Show commit log of unique commits of this branch (not on main)
+	diffcommitsfrommain = !"git log --no-merges origin/$(git mainormaster).."
+
+	# Two utils: 
+	#   What's the ancestor commit this branch shares with main?
+	diffbase = !"git merge-base HEAD origin/$(git mainormaster)"
+
+    # Is it a `main` or a `master` repo?
+	mainormaster = !"git branch --format '%(refname:short)' --sort=-committerdate --list master main | head -n1"
+
+
+[core]
+	excludesfile = ~/.gitignore
+	attributesfile = ~/.gitattributes
+	precomposeUnicode = true
+	# https://github.com/dandavison/delta
+	pager = delta
+
+[delta]
+	max-line-length = 700
+	# max-line-distance = 0.3 # better word-diff?
+	syntax-theme = base16
+	hyperlinks = true # i filed https://github.com/dandavison/delta/issues/362 but in 2022 i can't see brokenness in the issue nor repro weirdness. but i installed latest `less` anyway
+	                  # oh i found it. it doubles up the sha and adds some `8;;` at the end.
+					  # to fix.... install latest less (`less -V` should be >= v570). shouldn't need to set DELTA_PAGER.
+	# line-numbers = true # seems nice until you want to copypaste and they're there…
+	# navigate = true # eh. not great with short diffs.
+
+	file-style = bold yellow ul
+	file-decoration-style = yellow ol ul
+	hunk-header-decoration-style = blue
+	hunk-header-line-number-style = purple bold
+
+[interactive]
+	diffFilter = delta --color-only --features=interactive
+
+[color]
+  status = auto
+  diff = auto
+  branch = auto
+  interactive = auto
+  grep = auto
+
+# use separate file for username / github token / etc
+[include]
+	path = ~/.gitconfig.local
+
+# git mergetool
+[merge]
+	tool = opendiff
+	renameLimit = 0
+
+# correct typos
+[help]
+	autocorrect = 1
+
+[push]
+	default = tracking
+	followTags = true
+	autoSetupRemote = true
+
+[pull]
+	ff = only
+
+[checkout]
+	defaultRemote = origin
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+	process = git-lfs filter-process
+
+[fetch]
+	prune = true
+
+[stash]
+	showPatch = true
+
+[log]
+	date = relative

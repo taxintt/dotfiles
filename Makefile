@@ -16,5 +16,8 @@ brew: ## install from homebrew
 brew-dump: ## dump to Brewfile
 	brew bundle dump -f
 
+brew-install: ## install by using Brewfile
+	brew bundle
+
 link: ## make symlinks
 	./link.sh

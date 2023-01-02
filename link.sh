@@ -8,14 +8,14 @@ HOME=$HOME
 make_symlink(){
 	echo '---> making symlinks :) '
 	if [ $# -eq 1 ];then
-		_fromfilename=$1
-		_tofilename=$1
+		_basefile=$1
+		_linkfile=$1
 	fi
 	if [ $# -eq 2 ];then
-		_fromfilename=$1
-		_tofilename=$2
+		_basefile=$1
+		_linkfile=$2
 	fi
-	ln -hvfs "$CURRENT_DIR/$_fromfilename" "$HOME/$_tofilename"
+	ln -hvfs "$CURRENT_DIR/$_basefile" "$HOME/$_linkfile"
 	echo ' '
 }
 

@@ -22,6 +22,7 @@ make_symlink(){
 # make symbolic link
 make_symlink .zshrc
 make_symlink .gitignore
+make_symlink .gitconfig
 make_symlink .zshrc
 make_symlink .config/starship.toml
 make_symlink .config/wezterm/wezterm.lua

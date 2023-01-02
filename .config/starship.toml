@@ -1,9 +1,9 @@
 add_newline = false
+scan_timeout = 30
 
-[character]
-symbol = "🌱 "
 [directory]
 style = "bold cyan"
+truncation_length = 5
 
 [custom.arch]
 command = "uname -m"

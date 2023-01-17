@@ -85,8 +85,8 @@ return {
 		{ key = "u", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
 		{ key = "d", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Down" }) },
         --
-		{ key = "c", mods = "LEADER", action = wezterm.action({ CopyTo = "Clipboard" }) },
-		{ key = "v", mods = "LEADER", action = wezterm.action({ PasteFrom = "Clipboard" }) },
+		{ key = "c", mods = "CMD", action = wezterm.action({ CopyTo = "Clipboard" }) },
+		{ key = "v", mods = "CMD", action = wezterm.action({ PasteFrom = "Clipboard" }) },
         -- 
         -- https://github.com/wez/wezterm/issues/641
         { key = "q", mods = "LEADER", action = "ShowDebugOverlay" },

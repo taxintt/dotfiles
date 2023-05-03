@@ -58,12 +58,11 @@ return {
     -- keybindings
     -- https://wezfurlong.org/wezterm/config/default-keys.html?highlight=key%20bindings#default-shortcut--key-binding-assignments
 	disable_default_key_bindings = true,
-	quick_select_alphabet = "colemak",
+	quick_select_alphabet = "qwerty",
     -- https://wezfurlong.org/wezterm/config/keys.html?highlight=key%20bindings#leader-key
     -- press leadner key and "after that" press another key
 	leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }, 
 	keys = {
-        -- { key = "r", mods = "LEADER", action = "ReloadConfiguration" },
         { key = "r", mods = "CTRL", action = "ReloadConfiguration" },
         --
         { key = "t", mods = "CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },

@@ -7,6 +7,7 @@ alias cd..="cd .."
 alias rm='rm -i -v'
 alias mv='mv -i -v'
 alias cp='cp -i -v'
+alias jump="z"
 
 ## terraform
 alias tf='terraform'
@@ -139,10 +140,12 @@ fi
 eval "$(nodenv init -)"
 
 export NVM_DIR="$HOME/.nvm"
+export NODE_PATH=`npm root -g`
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
-alias jump="z"
-
-# copilot cli
+# github-copilot-cli
 eval "$(github-copilot-cli alias -- "$0")"
+
+# Golang tools
+export PATH="$HOME/go/bin:$PATH"

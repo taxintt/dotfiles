@@ -19,5 +19,8 @@ brew-dump: ## dump to Brewfile
 brew-install: ## install by using Brewfile
 	brew bundle
 
+brew-list-independent-packages: ## list independent packages
+	brew list | xargs -I{} sh -c 'brew uses --installed {} | wc -l | xargs printf "%20s is used by %2d formulae.\n" {}'
+
 link: ## make symlinks
 	./link.sh

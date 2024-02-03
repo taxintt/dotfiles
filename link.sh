@@ -27,3 +27,5 @@ make_symlink .gitconfig.local
 make_symlink .zshrc
 make_symlink .config/starship.toml
 make_symlink .config/wezterm/wezterm.lua
+make_symlink .czrc
+make_symlink changelog.config.js

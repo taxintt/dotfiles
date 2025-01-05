@@ -1,14 +1,14 @@
 local wezterm = require 'wezterm'
 local act = wezterm.action
 
-wezterm.on("open-htop-pane", function(window, pane)
-    window:perform_action(wezterm.action {
-        SplitVertical = {
-            domain = "CurrentPaneDomain",
-            args = {"htop"}
-        }
-    }, pane)
-end)
+-- wezterm.on("open-htop-pane", function(window, pane)
+--     window:perform_action(wezterm.action {
+--         SplitVertical = {
+--             domain = "CurrentPaneDomain",
+--             args = {"htop"}
+--         }
+--     }, pane)
+-- end)
 
 return {
     -- styles
@@ -58,7 +58,13 @@ return {
     -- keybindings
     -- https://wezfurlong.org/wezterm/config/default-keys.html?highlight=key%20bindings#default-shortcut--key-binding-assignments
     disable_default_key_bindings = true,
+
+    -- https://github.com/wez/wezterm/issues/4051
+    send_composed_key_when_left_alt_is_pressed = true,
+
     quick_select_alphabet = "qwerty",
+    exit_behavior = "Close",
+
     -- https://wezfurlong.org/wezterm/config/keys.html?highlight=key%20bindings#leader-key
     -- press leadner key and "after that" press another key
     leader = {
@@ -66,12 +72,12 @@ return {
         mods = "CTRL",
         timeout_milliseconds = 2000
     },
+    
     keys = {{
         key = "r",
         mods = "CTRL",
         action = "ReloadConfiguration"
-    }, --
-    {
+    }, {
         key = "t",
         mods = "CTRL",
         action = wezterm.action({
@@ -93,15 +99,7 @@ return {
                 domain = "CurrentPaneDomain"
             }
         })
-    }, -- 
-    {
-        key = "p",
-        mods = "LEADER",
-        action = wezterm.action({
-            EmitEvent = "open-htop-pane"
-        })
-    }, --
-    {
+    }, {
         key = "r",
         mods = "LEADER",
         action = wezterm.action({
@@ -125,8 +123,7 @@ return {
         action = wezterm.action({
             ActivatePaneDirection = "Down"
         })
-    }, --
-    {
+    }, {
         key = "c",
         mods = "CMD",
         action = wezterm.action({
@@ -138,18 +135,15 @@ return {
         action = wezterm.action({
             PasteFrom = "Clipboard"
         })
-    }, -- 
-    -- https://github.com/wez/wezterm/issues/641
-    {
+    }, {
         key = "q",
         mods = "LEADER",
-        action = "ShowDebugOverlay"
-    }, -- search for the lowercase string "hash" matching the case exactly
-    {
+        action = "ShowDebugOverlay" -- https://github.com/wez/wezterm/issues/641
+    }, {
         key = 'f',
         mods = 'CMD',
         action = act.Search {
             CaseSensitiveString = ''
-        }
+        } -- search for the lowercase string "hash" matching the case exactly
     }}
 }

@@ -21,6 +21,7 @@ make_symlink(){
 
 # make symbolic link
 make_symlink .zshrc
+make_symlink .cursorrules
 make_symlink .gitignore
 make_symlink .gitconfig
 make_symlink .gitconfig.local

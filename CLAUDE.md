@@ -1,3 +1,6 @@
+Please also reference the following documents as needed:
+
+@.claude/memories/go-cli.md description: "Project overview and general development guidelines for CLI Application in Go" globs: "**/*"
 # Project Overview
 
 ## General Guidelines

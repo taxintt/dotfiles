@@ -1,4 +1,16 @@
-# Project Overview
+Please also reference the following documents as needed. In this case, `@` stands for the project root directory.
+
+<Documents>
+  <Document>
+    <Path>@.codex/memories/go-cli.md</Path>
+    <Description>Project overview and general development guidelines for CLI Application in Go</Description>
+    <FilePatterns>**/*</FilePatterns>
+  </Document>
+</Documents>
+
+# Additional Conventions Beyond the Built-in Functions
+
+As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.# Project Overview
 
 ## General Guidelines
 

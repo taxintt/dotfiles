@@ -1,10 +1,7 @@
 ---
-root: false
-targets: ["*"]
-description: "Project overview and general development guidelines for CLI Application in Go"
-globs: ["**/*"]
+description: Project overview and general development guidelines for CLI Application in Go
+applyTo: '**/*'
 ---
-
 # Development Steps for CLI Application in Go
 
 ## 1. Overall Design

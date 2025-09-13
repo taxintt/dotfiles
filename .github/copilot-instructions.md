@@ -1,4 +1,15 @@
----
+Please also reference the following documents as needed. In this case, `@` stands for the project root directory.
+
+<Documents>
+  <Document>
+    <Path>@.github/instructions/go-cli.instructions.md</Path>
+    <Description>Project overview and general development guidelines for CLI Application in Go</Description>
+  </Document>
+</Documents>
+
+# Additional Conventions Beyond the Built-in Functions
+
+As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.---
 description: Project overview and general development guidelines
 applyTo: '**/*'
 ---

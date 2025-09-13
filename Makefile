@@ -23,4 +23,7 @@ brew-list-independent-packages: ## list independent packages
 	brew list | xargs -I{} sh -c 'brew uses --installed {} | wc -l | xargs printf "%20s is used by %2d formulae.\n" {}'
 
 link: ## make symlinks
-	./link.sh
+	./scripts/link.sh
+
+rule-sync: ## sync rules
+	npx rulesync generate -c rulesync.jsonc

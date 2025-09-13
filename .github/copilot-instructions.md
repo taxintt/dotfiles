@@ -1,6 +1,4 @@
-# Additional Conventions Beyond the Built-in Functions
-
-As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.---
+---
 description: Project overview and general development guidelines
 applyTo: '**/*'
 ---
@@ -8,7 +6,6 @@ applyTo: '**/*'
 
 ## General Guidelines
 
-- Use TypeScript for all new code
 - Follow consistent naming conventions
 - Write self-documenting code with clear variable and function names
 - Prefer composition over inheritance

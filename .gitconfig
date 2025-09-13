@@ -1,6 +1,6 @@
 [alias] 
 	c = commit -m
-	fpush = push --force
+	fpush = push --force-with-lease
 	s = status
 	stats = status 
 	sclone = clone --depth=1

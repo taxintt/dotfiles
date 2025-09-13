@@ -1,6 +1,9 @@
-# .cursorrules
-# https://gist.github.com/fumiya-kume/a313fc557e3289b7456bf17c26bff1a3
-# https://qiita.com/tichise/items/751d7a6c01a4d74b766c
+---
+root: true
+targets: ["*"]
+description: "Project overview and general development guidelines for CLI Application in Go"
+globs: ["**/*"]
+---
 
 # Development Steps for CLI Application in Go
 

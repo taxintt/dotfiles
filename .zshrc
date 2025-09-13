@@ -147,3 +147,6 @@ export PATH="$HOME/go/bin:$PATH"
 # signing commits
 # https://gist.github.com/repodevs/a18c7bb42b2ab293155aca889d447f1b
 export GPG_TTY=$(tty)
+
+# uv
+. "$HOME/.local/bin/env"

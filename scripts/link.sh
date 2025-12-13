@@ -2,7 +2,7 @@
 
 set -e
 
-CURRENT_DIR=$(cd "$(dirname "$0")"; pwd)
+CURRENT_DIR=$(cd "$(dirname "$0")/../"; pwd)
 HOME=$HOME
 
 make_symlink(){
@@ -25,7 +25,6 @@ make_symlink .cursorrules
 make_symlink .gitignore
 make_symlink .gitconfig
 make_symlink .gitconfig.local
-make_symlink .zshrc
 make_symlink .config/starship.toml
 make_symlink .config/wezterm/wezterm.lua
 make_symlink .czrc

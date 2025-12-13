@@ -95,3 +95,5 @@
 
 [user]
 	signingkey = 65243AC5A1EC917C
+[ghq]
+	root = /Users/taxin/src

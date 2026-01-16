@@ -1,3 +1,11 @@
+# homebrew
+export PATH=/opt/homebrew/bin:$PATH
+
+# mise
+eval "$(`brew --prefix`/bin/mise activate zsh)"
+mise completion zsh > $(brew --prefix)/share/zsh/site-functions/_mise
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
 # signing commits
 # https://gist.github.com/repodevs/a18c7bb42b2ab293155aca889d447f1b
 export GPG_TTY=$(tty)
@@ -61,7 +69,7 @@ repo() {
             # Create a new repository directory
             if [[ -z "$2" ]]; then
                 echo "Usage: repo create <repository_path>"
-                echo "Example: repo create github.com/user/new-repo"
+                echo "Example: repo create github.com/taxintt/new-repo"
                 return 1
             fi
             local repo_path="$(ghq root)/$2"
@@ -219,6 +227,10 @@ export PATH=$PATH:$GOPATH/bin
 # uv
 . "$HOME/.local/bin/env"
 
-# mise
-eval "$(`brew --prefix`/bin/mise activate zsh)"
-mise completion zsh > $(brew --prefix)/share/zsh/site-functions/_mise
+# aws_completer
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+complete -C '/opt/homebrew/bin/aws_completer' aws
+
+# git-wt
+eval "$(git wt --init zsh)"

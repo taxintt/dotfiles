@@ -27,3 +27,10 @@ link: ## make symlinks
 
 rule-sync: ## sync rules
 	npx rulesync generate -c rulesync.jsonc
+
+gitleaks-scan: ## scan gitleaks for all ghq repos
+	@echo "Starting gitleaks scan for all ghq repositories..."
+	@ghq list | while read repo; do \
+		echo "Scanning $$repo ..."; \
+		gitleaks detect --source "$$(ghq root)/$$repo" --report-path "$$(ghq root)/$$repo/gitleaks-report.json" || true; \
+	done

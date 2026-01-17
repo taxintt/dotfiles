@@ -29,3 +29,4 @@ make_symlink .config/starship.toml
 make_symlink .config/mise/config.toml
 make_symlink .czrc
 make_symlink changelog.config.js
+make_symlink .config/ghostty/config

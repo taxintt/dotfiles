@@ -30,3 +30,8 @@ make_symlink .config/mise/config.toml
 make_symlink .czrc
 make_symlink changelog.config.js
 make_symlink .config/ghostty/config
+make_symlink .claude/commands/branch.md
+make_symlink .claude/commands/commit.md
+make_symlink .claude/commands/pull-request.md
+make_symlink .claude/commands/git-create-branch-commit-pr.md
+make_symlink .claude/commands/system-design.md

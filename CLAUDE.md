@@ -1,26 +1,50 @@
-Please also reference the following documents as needed:
+# Core Philosophy
 
-@.claude/memories/go-cli.md description: "Project overview and general development guidelines for CLI Application in Go" globs: "**/*"
-# Project Overview
+- **Agent-First**: Delegate complex tasks to specialized agents in `.claude/agents/`
+- **Plan Before Execute**: Use Plan Mode for multi-file changes or unfamiliar code
+- **TDD**: Write tests before implementation
+- **Security-First**: Never compromise on security; use security-reviewer agent before commits
 
-## General Guidelines
+# Build & Test Commands
 
-- Follow consistent naming conventions
-- Write self-documenting code with clear variable and function names
-- Prefer composition over inheritance
-- Use meaningful comments for complex business logic
+```bash
+# Go projects
+go build ./...
+go test ./... -v
+go test ./... -cover
+golangci-lint run
+gofmt -w .
 
-## Code Style
+# JavaScript/TypeScript projects
+npm install
+npm run build
+npm run test
+npm run lint
+```
 
-- Use 2 spaces for indentation
-- Use semicolons
-- Use double quotes for strings
-- Use trailing commas in multi-line objects and arrays
+# Rules
 
-## Architecture Principles
+@.claude/rules/coding-style.md
+@.claude/rules/git-workflow.md
+@.claude/rules/testing.md
+@.claude/rules/security.md
+@.claude/rules/agents.md
+
+# Language-Specific Guidelines
+
+@.claude/memories/go-cli.md
+
+# Architecture Principles
 
 - Organize code by feature, not by file type
 - Keep related files close together
 - Use dependency injection for better testability
-- Implement proper error handling
 - Follow single responsibility principle
+
+# Success Metrics
+
+- All tests pass
+- Lint errors: 0
+- Test coverage: 80%+
+- No security vulnerabilities
+- Code is readable and well-documented

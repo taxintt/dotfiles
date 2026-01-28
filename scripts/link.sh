@@ -19,6 +19,28 @@ make_symlink(){
 	echo ' '
 }
 
+make_symlink_under_dir(){
+	echo '---> making symlinks under directory :) '
+	if [ $# -eq 2 ];then
+		_basefile_dir=$1
+		_linkfile_dir=$2
+	fi
+
+	if [ $# -eq 1 ];then
+		_basefile_dir=$1
+		_linkfile_dir=$1
+	fi
+
+	if [ ! -d "$HOME/$_linkfile_dir" ]; then
+		mkdir -p "$HOME/$_linkfile_dir"
+	fi
+
+	for file in $(ls "$CURRENT_DIR/$_basefile_dir"); do
+		ln -hvfs "$CURRENT_DIR/$_basefile_dir/$file" "$HOME/$_linkfile_dir/$file"
+	done
+	echo ' '
+}
+
 # make symbolic link
 make_symlink .zshrc
 make_symlink .cursorrules
@@ -30,8 +52,10 @@ make_symlink .config/mise/config.toml
 make_symlink .czrc
 make_symlink changelog.config.js
 make_symlink .config/ghostty/config
-make_symlink .claude/commands/branch.md
-make_symlink .claude/commands/commit.md
-make_symlink .claude/commands/pull-request.md
-make_symlink .claude/commands/git-create-branch-commit-pr.md
-make_symlink .claude/commands/system-design.md
+
+# make symbolic links under directory
+make_symlink_under_dir .claude/commands
+make_symlink_under_dir .claude/agents
+make_symlink_under_dir .claude/context
+make_symlink_under_dir .claude/rules
+make_symlink_under_dir .claude/skills

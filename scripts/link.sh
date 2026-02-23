@@ -56,6 +56,5 @@ make_symlink .config/ghostty/config
 # make symbolic links under directory
 make_symlink_under_dir .claude/commands
 make_symlink_under_dir .claude/agents
-make_symlink_under_dir .claude/context
 make_symlink_under_dir .claude/rules
 make_symlink_under_dir .claude/skills

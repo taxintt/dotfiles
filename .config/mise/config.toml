@@ -1,8 +1,16 @@
+[settings]
+disable_backends = ["asdf", "vfox"]
+
 [tools]
+aws = "latest"
 actionlint = "latest"
 ecspresso = "latest"
 github-cli = "latest"
-go = "latest"
-node = "lts"
 terraform = "latest"
+
+# [Node.js]
+node = "lts"
 pnpm = "latest"
+
+# [Go]
+go = "latest"

@@ -52,6 +52,7 @@ make_symlink .config/mise/config.toml
 make_symlink .czrc
 make_symlink changelog.config.js
 make_symlink .config/ghostty/config
+make_symlink .claude/settings.json
 
 # make symbolic links under directory
 make_symlink_under_dir .claude/commands

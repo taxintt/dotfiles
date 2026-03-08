@@ -19,15 +19,15 @@ fi
 
 # Search for markdown files containing the query
 # Use ripgrep for fast searching
-# Try Claude's built-in ripgrep first, then fall back to system rg
-CLAUDE_BIN=$(command -v claude 2>/dev/null || true)
-if [[ -n "$CLAUDE_BIN" ]]; then
-    rg_search() {
-        "$CLAUDE_BIN" --ripgrep "$@"
-    }
-elif command -v rg &> /dev/null; then
+# Prefer system rg, fall back to Claude's built-in ripgrep
+# Note: unset CLAUDECODE to avoid nested session restriction when using claude --ripgrep
+if command -v rg &> /dev/null; then
     rg_search() {
         rg "$@"
+    }
+elif CLAUDE_BIN=$(command -v claude 2>/dev/null) && [[ -n "$CLAUDE_BIN" ]]; then
+    rg_search() {
+        CLAUDECODE="" "$CLAUDE_BIN" --ripgrep "$@"
     }
 else
     echo "Error: ripgrep (rg) not found. Please install it: brew install ripgrep" >&2
@@ -44,10 +44,10 @@ echo ""
 RESULTS=$(rg_search \
     --type md \
     --ignore-case \
-    --context 2 \
     --max-count 3 \
-    --heading \
+    --no-heading \
     --color never \
+    --line-number \
     "$QUERY" \
     "$VAULT_PATH" \
     2>/dev/null || true)
@@ -58,7 +58,7 @@ if [[ -z "$RESULTS" ]]; then
 fi
 
 # Get unique files from results
-UNIQUE_FILES=$(echo "$RESULTS" | grep -E '^[^:]+\.md' | cut -d: -f1 | sort -u | head -n "$MAX_RESULTS")
+UNIQUE_FILES=$(echo "$RESULTS" | grep -oE '^[^:]+\.md' | sort -u | head -n "$MAX_RESULTS")
 
 if [[ -z "$UNIQUE_FILES" ]]; then
     echo "❌ No markdown files found"

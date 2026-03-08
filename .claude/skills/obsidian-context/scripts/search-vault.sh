@@ -20,9 +20,10 @@ fi
 # Search for markdown files containing the query
 # Use ripgrep for fast searching
 # Try Claude's built-in ripgrep first, then fall back to system rg
-if [[ -x "/Users/taxin/.local/share/claude/versions/2.1.44" ]]; then
+CLAUDE_BIN=$(command -v claude 2>/dev/null || true)
+if [[ -n "$CLAUDE_BIN" ]]; then
     rg_search() {
-        /Users/taxin/.local/share/claude/versions/2.1.44 --ripgrep "$@"
+        "$CLAUDE_BIN" --ripgrep "$@"
     }
 elif command -v rg &> /dev/null; then
     rg_search() {

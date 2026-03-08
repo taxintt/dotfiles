@@ -24,7 +24,7 @@ The search results above contain excerpts from the Obsidian vault that may be re
 
 The search behavior can be customized with environment variables:
 
-- `OBSIDIAN_VAULT_PATH`: Path to Obsidian vault (default: `/Users/taxin/obsidian`)
+- `OBSIDIAN_VAULT_PATH`: Path to Obsidian vault (default: `$HOME/obsidian`)
 - `OBSIDIAN_MAX_RESULTS`: Maximum number of files to show (default: 5)
 
 ## 💡 Tips

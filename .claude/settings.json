@@ -26,47 +26,17 @@
       "Bash(mysql:*)"
     ]
   },
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claude-notification.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claude-notification.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "tool_permission_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claude-notification.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "user_question_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claude-notification.sh"
-          }
-        ]
-      }
-    ]
-  },
+  "hooks": {},
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "dig@kuu-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "kuu-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "fumiya-kume/claude-code"
+      }
+    }
   }
 }

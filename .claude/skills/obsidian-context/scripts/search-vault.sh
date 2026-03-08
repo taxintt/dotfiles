@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-VAULT_PATH="${OBSIDIAN_VAULT_PATH:-~/obsidian}"
+VAULT_PATH="${OBSIDIAN_VAULT_PATH:-$HOME/obsidian}"
 QUERY="$*"
 MAX_RESULTS="${OBSIDIAN_MAX_RESULTS:-5}"
 

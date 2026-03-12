@@ -53,9 +53,11 @@ make_symlink .czrc
 make_symlink changelog.config.js
 make_symlink .config/ghostty/config
 make_symlink .claude/settings.json
+make_symlink .claude/RTK.md
 
 # make symbolic links under directory
 make_symlink_under_dir .claude/commands
 make_symlink_under_dir .claude/agents
 make_symlink_under_dir .claude/rules
 make_symlink_under_dir .claude/skills
+make_symlink_under_dir .claude/hooks

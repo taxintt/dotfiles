@@ -1,11 +1,6 @@
 {
   "includeCoAuthoredBy": false,
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y ccusage statusline",
-    "padding": 0
-  },
-  "permissions":{
+  "permissions": {
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm:*)",
@@ -26,15 +21,37 @@
       "Bash(mysql:*)"
     ]
   },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": ["github.com", "api.github.com", "*.githubusercontent.com"],
+      "allowLocalBinding": true
+    },
+    "enableWeakerNetworkIsolation": true
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccusage statusline",
+    "padding": 0
+  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    "dig@kuu-marketplace": true
+    "dig@kuu-marketplace": true,
+    "terraform-code-generation@hashicorp": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
       "source": {
         "source": "github",
         "repo": "fumiya-kume/claude-code"
+      }
+    },
+    "hashicorp": {
+      "source": {
+        "source": "github",
+        "repo": "hashicorp/agent-skills"
       }
     }
   }

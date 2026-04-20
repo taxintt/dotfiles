@@ -1,53 +1,82 @@
-# Skill Quality Checklist
+# Skill 品質チェックリスト (TDD 適応版)
 
-Validate each item before finalizing a skill.
+Skill をデプロイする前に、以下を順に検証する。
 
-## Frontmatter
+## RED Phase (baseline test を先に、dispatch 不能時は hypothetical RED 可)
 
-- [ ] `name`: max 64 chars, lowercase/numbers/hyphens only
-- [ ] `name`: gerund form preferred (`processing-pdfs`, not `pdf-processor`)
-- [ ] `name`: no reserved words (`anthropic`, `claude`)
-- [ ] `description`: non-empty, max 1024 chars
-- [ ] `description`: third person ("Processes...", not "I can..." or "You can...")
-- [ ] `description`: includes what it does AND when to use it
-- [ ] `description`: includes key trigger terms for discovery
+- [ ] Pressure scenario を 3+ pressure 組み合わせで書いた (時間 + sunk cost + 疲労 など)
+- [ ] Scenario に具体的な制約 (時刻、行数、deadline) を入れた
+- [ ] A/B/C など concrete options を提示した (open-ended にしない)
+- [ ] Skill なしで subagent に実行させた **または** dispatch 不能環境で hypothetical RED (想定 rationalization 3+ 列挙) を実施し、本文に「hypothetical 実施」と明記した
+- [ ] Agent の選択と rationalization を逐語記録した (hypothetical の場合は「想定 rationalization」として列挙)
+- [ ] Rationalization の pattern を identify した
 
-## Content Quality
+**「作らない」判断の場合**: SKILL.md「When to Create」の「作らない」条件に合致するなら、この RED Phase の列挙のみで完了してよい。GREEN / REFACTOR は skip 可。判断根拠をレポートに明示すること。
 
-- [ ] SKILL.md body under 500 lines
-- [ ] Only information Claude doesn't already know
-- [ ] No verbose explanations of common concepts
-- [ ] One recommended approach per task (not multiple equivalent options)
-- [ ] Consistent terminology throughout
-- [ ] No time-sensitive information (or in collapsible "old patterns" section)
-- [ ] Concrete examples, not abstract descriptions
+## GREEN Phase (skill を書く)
 
-## Structure
+### Frontmatter
+- [ ] `name`: letters / numbers / hyphens のみ
+- [ ] `name`: 動詞ベース / gerund (`creating-skills`, `condition-based-waiting`)
+- [ ] `description`: 三人称
+- [ ] `description`: 「Use when...」/「〜のとき使う」で始まる
+- [ ] `description`: skill の workflow を要約していない
+- [ ] `description`: 具体的な trigger / 症状 / 文脈を含む
+- [ ] `description`: ≤ 500 文字を目安
 
-- [ ] Progressive disclosure: overview in SKILL.md, details in separate files
-- [ ] File references are one level deep (no nested chains)
-- [ ] Reference files > 100 lines have table of contents
-- [ ] Descriptive filenames (`error-handling.md`, not `doc2.md`)
-- [ ] Forward slashes in all paths (no `\`)
-- [ ] "When to Activate" section present
+### Body
+- [ ] SKILL.md ≤ 500 行
+- [ ] Overview で核心原則を 1-2 文
+- [ ] Claude が既知の内容を説明していない
+- [ ] 等価な選択肢を複数並べていない (1 つ推奨)
+- [ ] 一貫した用語
+- [ ] 抽象でなく concrete example
+- [ ] Code は 1 言語で excellent な 1 例
+- [ ] RED で観察した具体的 failure を address している
 
-## Workflows (if applicable)
+### Skill Type 判別
+- [ ] Technique / Pattern / Reference / Discipline のどれか判別した
+- [ ] Discipline skill なら Rationalization Table + Red Flags を入れた
 
-- [ ] Clear sequential steps
-- [ ] Copyable checklist for progress tracking
-- [ ] Feedback loops for quality-critical operations (validate -> fix -> repeat)
-- [ ] Decision points clearly marked (conditional workflows)
+### 検証
+- [ ] 同じ scenario を skill ありで subagent 実行した
+- [ ] Agent が compliance した
 
-## Scripts (if applicable)
+## REFACTOR Phase (loophole を塞ぐ、dispatch 不能時は想定 rationalization で代替可)
 
-- [ ] Scripts handle errors explicitly (don't punt to Claude)
-- [ ] No magic constants (all values justified)
-- [ ] Required packages listed
-- [ ] Clear whether to execute or read as reference
-- [ ] Validation/verification steps for critical operations
+- [ ] 新 rationalization が出たか確認した (hypothetical の場合は想定 rationalization に対して counter が当たっているか自己 review)
+- [ ] 各 rationalization に explicit counter を追加した
+- [ ] Rationalization Table に 1 行追加した (discipline skill)
+- [ ] Red Flags list を更新した (discipline skill)
+- [ ] Description に違反 symptom を反映した
+- [ ] 再テストで compliance を維持した (hypothetical の場合は counter 適用後の draft に対して想定 rationalization を再度当てて自己 review)
+- [ ] Meta-test (「skill をどう書き換えれば明確だったか」) を実施した
+- [ ] 新 rationalization が出なくなるまで繰り返した
 
-## Commands (if applicable)
+## File Organization
 
-- [ ] `allowed_tools` lists only required tools
-- [ ] Description matches actual behavior
-- [ ] Placed in correct location (`.claude/commands/` or skill's `commands/`)
+- [ ] Flat namespace (1 level nesting まで)
+- [ ] Heavy reference (100+ 行) のみ別ファイル化
+- [ ] Reusable script のみ別ファイル化
+- [ ] 50 行未満のコードは inline
+- [ ] 100+ 行の reference に目次 (table of contents) がある
+- [ ] ファイル名が descriptive (`error-handling.md`、`doc2.md` ではない)
+- [ ] パスは常に forward slash (`/`)
+
+## Commands (該当する場合)
+
+- [ ] `allowed-tools` が必要なものだけ
+- [ ] Description が実挙動と一致
+- [ ] 配置場所が正しい (`.claude/commands/` or skill の `commands/`)
+
+## STOP Gate
+
+- [ ] Batch 作成していない (1 skill ずつデプロイ完了)
+- [ ] 検証前に次 skill に着手していない
+- [ ] Untested な content を残していない
+
+## Red Flags — この checklist 自身に対して
+
+- [ ] 「テストは省略していい、なぜなら…」 → Iron Law 違反
+- [ ] 「rationalization table は空でもいい」 → baseline をサボった証拠
+- [ ] 「description に workflow 書いたほうが分かりやすい」 → 本文がスキップされる

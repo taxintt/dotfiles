@@ -33,10 +33,13 @@ allowed-tools: ["AskUserQuestion", "WebSearch", "WebFetch", "Bash", "Read", "Gre
 
 ### Phase 4: Iterative Search and Analysis
 - **20～50の検索クエリ**を実行
+  - カウント定義: `WebSearch` / `WebFetch` / `gh`（`gh api`, `gh search` など）の **ツール呼び出し 1 回 = 1 クエリ**。`Read` / `Grep` はクエリに含めない
 - `WebSearch` - トピックの概要把握、最新情報の収集
 - `WebFetch` - 個別ページの詳細分析
 - `gh` CLI (via Bash) - GitHub上のリポジトリ、Issue、PR調査
-- **交差検証**: 複数ソースで情報を確認
+- **交差検証**: 各サブ質問につき最低 2 ソース。**独立した発行元**
+  - 同一ドメイン / 同一運営組織のサイト同士は **1 ソース扱い**（例: `nextjs.org` と `vercel.com/blog` はいずれも Vercel 運営なので 1 ソース）
+  - 異なる組織が発行したものを独立 2 ソースと数える（例: `nextjs.org` + 第三者ベンチマーク記事）
 - **一次情報優先**: 公式ドキュメント、リポジトリ、論文を重視
 
 ### Phase 5: Synthesis and Report
@@ -107,7 +110,7 @@ allowed-tools: ["AskUserQuestion", "WebSearch", "WebFetch", "Bash", "Read", "Gre
 - ❌ **避けるべき**: 古い情報、不明確な出典
 
 ### 引用管理
-- HTMLアンカータグを使用: `[ソース名](URL){:target="_blank"}`
+- プレーン Markdown の `[ソース名](URL)` を使用（Kramdown 拡張 `{:target="_blank"}` は使わない）
 - 引用には必ず出典URLを明記
 - 複数ソースで同じ情報を確認
 

@@ -194,13 +194,17 @@ gh search code "remix enterprise" --language typescript
 
 ### 並列検索の活用
 
-独立したサブ質問は並列で調査：
+独立したサブ質問は並列で調査する。Claude Code では **単一メッセージ内に複数のツール呼び出しを並べる** ことで並列実行される（shell の `&` 記法ではない）：
 
-```bash
-# 並列実行可能
-WebSearch("Next.js performance") & WebSearch("Remix performance")
-WebFetch("https://nextjs.org/docs/security") & WebFetch("https://remix.run/docs/security")
 ```
+# 1 つの assistant メッセージで以下を同時に発行
+WebSearch("Next.js performance")
+WebSearch("Remix performance")
+WebFetch("https://nextjs.org/docs/security")
+WebFetch("https://remix.run/docs/security")
+```
+
+並列単位の目安: Overview フェーズで 3-5 件、Deep Dive では独立したサブ質問単位で 2-3 件ずつ並列化。
 
 ### 情報の記録フォーマット
 
@@ -343,7 +347,7 @@ WebFetch("https://nextjs.org/docs/security") & WebFetch("https://remix.run/docs/
 
 ### 出力形式
 
-Markdownファイルとして出力、またはチャット内に直接表示。
+**デフォルト: チャット内に直接 Markdown 表示**。ユーザーが明示的に「ファイルで」「保存して」等と要求した場合に限り、ファイル出力（パスもユーザーに確認）。
 
 完全なテンプレートは [output-template.md](output-template.md) を参照。
 

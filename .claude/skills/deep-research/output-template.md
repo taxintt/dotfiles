@@ -52,16 +52,16 @@
 [詳細な説明]
 
 **エビデンス**:
-- [[ソース1タイトル](URL){:target="_blank"}] - [信頼性: High/Medium/Low]
+- [[ソース1タイトル](URL)] - [信頼性: High/Medium/Low]
   > "引用文"
-- [[ソース2タイトル](URL){:target="_blank"}] - [信頼性: High/Medium/Low]
+- [[ソース2タイトル](URL)] - [信頼性: High/Medium/Low]
 
 ### [詳細トピック2]
 
 [詳細な説明]
 
 **エビデンス**:
-- [[ソース名](URL){:target="_blank"}] - [信頼性]
+- [[ソース名](URL)] - [信頼性]
 
 ### 比較表（該当する場合）
 
@@ -141,26 +141,26 @@
 ### 公式ドキュメント（信頼性: High）
 
 1. **[ドキュメントタイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    アクセス日: YYYY-MM-DD
    概要: [簡単な説明]
 
 2. **[ドキュメントタイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    アクセス日: YYYY-MM-DD
    概要: [簡単な説明]
 
 ### 技術ブログ・記事（信頼性: High～Medium）
 
 3. **[記事タイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    著者: [著者名]
    公開日: YYYY-MM-DD
    アクセス日: YYYY-MM-DD
    概要: [簡単な説明]
 
 4. **[記事タイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    著者: [著者名]
    公開日: YYYY-MM-DD
    アクセス日: YYYY-MM-DD
@@ -169,13 +169,13 @@
 ### GitHubリポジトリ（信頼性: High）
 
 5. **[リポジトリ名]**
-   URL: [https://github.com/owner/repo](https://github.com/owner/repo){:target="_blank"}
+   URL: [https://github.com/owner/repo](https://github.com/owner/repo)
    スター数: [数値]
    最終更新: YYYY-MM-DD
    概要: [簡単な説明]
 
 6. **[リポジトリ名]**
-   URL: [https://github.com/owner/repo](https://github.com/owner/repo){:target="_blank"}
+   URL: [https://github.com/owner/repo](https://github.com/owner/repo)
    スター数: [数値]
    最終更新: YYYY-MM-DD
    概要: [簡単な説明]
@@ -183,14 +183,14 @@
 ### コミュニティ・フォーラム（信頼性: Medium～Low）
 
 7. **[ディスカッションタイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    プラットフォーム: Stack Overflow / Reddit / GitHub Discussions
    投稿日: YYYY-MM-DD
    アクセス日: YYYY-MM-DD
    注意: [複数ソースで確認済み / 参考情報として記載]
 
 8. **[ディスカッションタイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    プラットフォーム: Stack Overflow / Reddit / GitHub Discussions
    投稿日: YYYY-MM-DD
    アクセス日: YYYY-MM-DD
@@ -199,7 +199,7 @@
 ### 論文・ホワイトペーパー（信頼性: High）
 
 9. **[論文タイトル]**
-   URL: [https://example.com](https://example.com){:target="_blank"}
+   URL: [https://example.com](https://example.com)
    著者: [著者名]
    発行: [学会名 / 企業名]
    公開日: YYYY-MM-DD

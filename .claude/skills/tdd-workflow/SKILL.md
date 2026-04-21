@@ -1,60 +1,63 @@
 ---
 name: tdd-workflow
-description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
+description: 新機能の実装、バグ修正、リファクタリングを行う際に使用する。テスト先行開発を強制し、unit / integration / E2E を含む 80% 以上のカバレッジを求める。
 ---
 
-# Test-Driven Development Workflow
+# Test-Driven Development ワークフロー
 
-Ensures all code development follows TDD principles with comprehensive test coverage.
+すべてのコード開発が TDD 原則と包括的なテストカバレッジに従うことを保証する。
 
-## When to Activate
+## 発火タイミング
 
-- Writing new features or functionality
-- Fixing bugs or issues
-- Refactoring existing code
-- Adding API endpoints
+- 新機能・新しい機能性の実装
+- バグ修正
+- 既存コードのリファクタリング
+- API エンドポイントの追加
 
-## TDD Cycle: RED → GREEN → REFACTOR
+## TDD サイクル: RED → GREEN → REFACTOR
 
-1. **RED** - Write a failing test that describes the desired behavior
-2. **GREEN** - Write minimal code to make the test pass
-3. **REFACTOR** - Improve code while keeping tests green
-4. **REPEAT** - Continue with next requirement
+1. **RED** - 望む挙動を記述する、失敗するテストを書く
+2. **GREEN** - テストを通す最小限のコードを書く
+3. **REFACTOR** - テストを緑に保ったままコードを改善する
+4. **REPEAT** - 次の要件へ続ける
 
-## Coverage Requirements
+## カバレッジ要件
 
-- Minimum 80% coverage (unit + integration + E2E)
-- All edge cases covered
-- Error scenarios tested
-- Boundary conditions verified
+- 最小 80% カバレッジ（unit + integration + E2E）
+- すべてのエッジケースをカバー
+- エラーシナリオをテスト済み
+- 境界条件を検証済み
 
-## Test Types
+## テストの種類
 
-| Type | Scope | Examples |
+| 種別 | スコープ | 例 |
 |------|-------|---------|
-| Unit | Individual functions, utilities | Pure functions, helpers |
-| Integration | API endpoints, DB operations | Service interactions |
-| E2E | Critical user flows | Browser automation |
+| Unit | 個別の関数・ユーティリティ | 純関数、helper |
+| Integration | API エンドポイント、DB 操作 | サービス間連携 |
+| E2E | 重要なユーザーフロー | ブラウザ自動化 |
 
-## Workflow Steps
+## ワークフロー
 
-1. Write user journey: `As a [role], I want to [action], so that [benefit]`
-2. Generate test cases from the journey
-3. Run tests - verify they FAIL (RED)
-4. Implement minimal code (GREEN)
-5. Run tests - verify they PASS
-6. Refactor while keeping tests green
-7. Verify 80%+ coverage
+1. ユーザーストーリーを書く: `[role] として [action] したい。なぜなら [benefit] だから`
+2. ストーリーからテストケースを生成する
+3. テストを実行し、**失敗**することを確認（RED）
+4. 最小限のコードを実装（GREEN）
+5. テストを実行し、**成功**することを確認
+6. テストを緑に保ちながらリファクタリング
+7. 80% 以上のカバレッジを確認
 
 ## Best Practices
 
-- **Test behavior, not implementation** - Test what users see, not internal state
-- **One assert per test** - Focus on single behavior
-- **Arrange-Act-Assert** - Clear test structure
-- **Independent tests** - Each test sets up its own data, no dependencies
-- **Semantic selectors** - Use `data-testid` or text content, not CSS classes
+- **挙動をテストし、実装をテストしない** - ユーザーが見るものをテストする。内部状態はテストしない
+- **テスト 1 本につき assert は 1 つ** - 単一の挙動にフォーカス
+- **Arrange-Act-Assert** - 明確なテスト構造
+- **独立したテスト** - 各テストが自分でデータを用意。依存しない
+- **意味のあるセレクタ** - CSS クラスではなく `data-testid` やテキストで指定
 
-## Language-Specific Patterns
+## 言語別パターン
 
-- For **Go** testing patterns: use the `golang-testing` skill
-- For **TypeScript** testing patterns: read `patterns-ts.md` in this directory
+言語別パターンは **必ず併読**（参考ではなく必須）:
+
+- **Go**: `golang-testing` skill を併読。table-driven test, subtest 命名, `tt := tt` キャプチャ, `go test -cover -race` を採用。
+- **TypeScript**: 同ディレクトリの `patterns-ts.md` を併読。pure util / React コンポーネント / API integration / E2E / モック の 5 カテゴリからシナリオに該当するものを選ぶ。
+- **他言語**: 言語固有 skill が無ければ、本 SKILL.md の原則（RED → GREEN → REFACTOR、AAA、80% coverage、behavior テスト）をそのまま適用。

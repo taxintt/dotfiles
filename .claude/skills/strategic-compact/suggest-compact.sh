@@ -28,7 +28,10 @@
 # - Plan has been finalized
 
 # Track tool call count (increment in a temp file)
-COUNTER_FILE="/tmp/claude-tool-count-$$"
+# Use CLAUDE_SESSION_ID if available (stable across hook invocations within a session);
+# fall back to the parent shell's PPID (stable per terminal) rather than $$ (new PID per hook).
+SESSION_KEY="${CLAUDE_SESSION_ID:-$PPID}"
+COUNTER_FILE="/tmp/claude-tool-count-${SESSION_KEY}"
 THRESHOLD=${COMPACT_THRESHOLD:-50}
 
 # Initialize or increment counter

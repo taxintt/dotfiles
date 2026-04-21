@@ -1,6 +1,37 @@
-# TypeScript Testing Patterns
+# TypeScript テストパターン
 
-## Unit Test Pattern (Jest/Vitest)
+## 純ユーティリティ関数パターン (Jest/Vitest)
+
+純関数 / 非コンポーネントのユーティリティ。AAA を 1 it 1 assertion で書く。決定論のため時刻・タイムゾーン依存は UTC 固定。
+
+```typescript
+import { formatDate } from './formatDate'
+
+describe('formatDate', () => {
+  it('converts epoch 0 to 1970-01-01 (UTC)', () => {
+    // Arrange
+    const ts = 0
+    // Act
+    const result = formatDate(ts)
+    // Assert
+    expect(result).toBe('1970-01-01')
+  })
+
+  it('pads single-digit month and day with leading zeros', () => {
+    expect(formatDate(Date.UTC(2024, 0, 5))).toBe('2024-01-05')
+  })
+
+  it('handles end-of-year boundary', () => {
+    expect(formatDate(Date.UTC(2023, 11, 31, 23, 59, 59))).toBe('2023-12-31')
+  })
+
+  it('throws on non-finite input', () => {
+    expect(() => formatDate(Number.NaN)).toThrow('Invalid timestamp')
+  })
+})
+```
+
+## Unit Test パターン (Jest/Vitest)
 
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/react'
@@ -26,7 +57,7 @@ describe('Button Component', () => {
 })
 ```
 
-## API Integration Test Pattern
+## API Integration Test パターン
 
 ```typescript
 import { NextRequest } from 'next/server'
@@ -51,7 +82,7 @@ describe('GET /api/markets', () => {
 })
 ```
 
-## E2E Test Pattern (Playwright)
+## E2E Test パターン (Playwright)
 
 ```typescript
 import { test, expect } from '@playwright/test'
@@ -70,7 +101,7 @@ test('user can search and filter markets', async ({ page }) => {
 })
 ```
 
-## Mocking External Services
+## 外部サービスのモック
 
 ```typescript
 // Supabase
@@ -96,7 +127,7 @@ jest.mock('@/lib/redis', () => ({
 }))
 ```
 
-## Coverage Thresholds
+## カバレッジ閾値
 
 ```json
 {
@@ -113,11 +144,11 @@ jest.mock('@/lib/redis', () => ({
 }
 ```
 
-## Common Mistakes
+## よくある間違い
 
-| Wrong | Right |
+| 誤 | 正 |
 |-------|-------|
 | `expect(component.state.count).toBe(5)` | `expect(screen.getByText('Count: 5')).toBeInTheDocument()` |
 | `await page.click('.css-class-xyz')` | `await page.click('button:has-text("Submit")')` |
-| Tests depend on each other | Each test sets up its own data |
-| `time.Sleep()` in tests | Use channels or conditions |
+| テスト同士が依存している | 各テストが自前でデータを用意 |
+| テスト内で `time.Sleep()` | チャネルや条件を使う |

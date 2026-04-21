@@ -1,70 +1,51 @@
-# /learn - Extract Reusable Patterns
+---
+description: 現在のセッションから再利用可能なパターンを抽出し、skill ファイルとして保存する
+---
 
-Analyze the current session and extract any patterns worth saving as skills.
+# /learn
 
-## Trigger
+現在のセッションで解決した non-trivial な問題から、将来のセッションで使える再利用可能なパターンを抽出して skill 化する。
 
-Run `/learn` at any point during a session when you've solved a non-trivial problem.
+## 抽出対象
 
-## What to Extract
+1. **エラー解決パターン** — どんなエラーで、根本原因は何で、何が効いたか
+2. **デバッグ手法** — 非自明な手順、ツールの組合せ
+3. **回避策** — ライブラリの癖、API の制約、バージョン依存の挙動
+4. **プロジェクト固有のパターン** — 既存コードベースの規約、設計判断、統合手順
 
-Look for:
+## 手順
 
-1. **Error Resolution Patterns**
-   - What error occurred?
-   - What was the root cause?
-   - What fixed it?
-   - Is this reusable for similar errors?
+1. セッションを振り返り、抽出可能なパターンを特定する
+2. 最も価値の高い 1 つに絞る
+3. 下記フォーマットでドラフトを書く
+4. **保存前にユーザーに確認**（承認は `yes` / `ok` / `approve` / 「承認」を想定、それ以外は破棄）
+5. 承認後、`~/.claude/skills/learned/<kebab-case-name>.md` に保存（ディレクトリが無い場合は作成）
 
-2. **Debugging Techniques**
-   - Non-obvious debugging steps
-   - Tool combinations that worked
-   - Diagnostic patterns
+ファイル名は kebab-case、3-5 語を目安。
 
-3. **Workarounds**
-   - Library quirks
-   - API limitations
-   - Version-specific fixes
-
-4. **Project-Specific Patterns**
-   - Codebase conventions discovered
-   - Architecture decisions made
-   - Integration patterns
-
-## Output Format
-
-Create a skill file at `~/.claude/skills/learned/[pattern-name].md`:
+## 出力フォーマット
 
 ```markdown
-# [Descriptive Pattern Name]
+# <パターン名>
 
-**Extracted:** [Date]
-**Context:** [Brief description of when this applies]
+**Extracted:** <日付>
+**Context:** <適用される状況を 1-2 行>
 
 ## Problem
-[What problem this solves - be specific]
+<何を解決するか>
 
 ## Solution
-[The pattern/technique/workaround]
+<パターン / 技法 / 回避策>
 
 ## Example
-[Code example if applicable]
+<コード例があれば>
 
 ## When to Use
-[Trigger conditions - what should activate this skill]
+<トリガー条件>
 ```
 
-## Process
+## 除外対象
 
-1. Review the session for extractable patterns
-2. Identify the most valuable/reusable insight
-3. Draft the skill file
-4. Ask user to confirm before saving
-5. Save to `~/.claude/skills/learned/`
-
-## Notes
-
-- Don't extract trivial fixes (typos, simple syntax errors)
-- Don't extract one-time issues (specific API outages, etc.)
-- Focus on patterns that will save time in future sessions
-- Keep skills focused - one pattern per skill
+- typo / 単純な構文エラー
+- 一度きりの事象（特定の API 障害など）
+- 他 skill / CLAUDE.md / rules ですでにカバー済み

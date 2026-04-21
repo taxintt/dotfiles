@@ -1,59 +1,67 @@
+---
+description: 現在のコードベースに対してビルド / 型 / lint / テスト / シークレット / デバッグ文 / git 状態を順次検証する
+argument-hint: "[quick|full|pre-commit|pre-pr]"
+---
+
 # Verification Command
 
-Run comprehensive verification on current codebase state.
+PR / commit 前に、現プロジェクトの状態を順次検証する。
 
-## Instructions
+## 引数（モード）
 
-Execute verification in this exact order:
+- `quick`: 1, 2 のみ
+- `full`（デフォルト）: 1-7 すべて
+- `pre-commit`: 1, 2, 3, 5, 6
+- `pre-pr`: full + 7（セキュリティスキャン）
+
+## 手順
 
 1. **Build Check**
-   - Run the build command for this project
-   - If it fails, report errors and STOP
+   - プロジェクトのビルドコマンドを検出（`package.json` / `Makefile` / `go.mod` 等）
+   - 曖昧な場合はユーザーに確認
+   - 失敗したらエラーを報告して STOP
 
 2. **Type Check**
-   - Run TypeScript/type checker
-   - Report all errors with file:line
+   - 言語に応じて: `tsc` / `go vet ./...` / `mypy` など
+   - `file:line` でエラーを列挙
 
 3. **Lint Check**
-   - Run linter
-   - Report warnings and errors
+   - 検出した lint コマンド（`eslint` / `golangci-lint` / `ruff` 等）
+   - 警告 / エラーを列挙
 
 4. **Test Suite**
-   - Run all tests
-   - Report pass/fail count
-   - Report coverage percentage
+   - 検出したテストコマンドを実行
+   - pass / fail 数とカバレッジ % を報告
 
-5. **Console.log Audit**
-   - Search for console.log in source files
-   - Report locations
+5. **Secret Scan**
+   - ソース内の機密値の検出（トークン / パスワード / API key らしき文字列）
+   - `.env` / credentials.json など秘匿ファイルが staged になっていないか
 
-6. **Git Status**
-   - Show uncommitted changes
-   - Show files modified since last commit
+6. **Debug Statement Audit**
+   - 言語別パターン:
+     - JS / TS: `console.log` / `console.debug`
+     - Go: `fmt.Println` / `log.Println`（log パッケージ運用の例外を除く）
+     - Python: `print`
+   - 場所を列挙
 
-## Output
+7. **Git Status**
+   - 未コミットの変更
+   - 直近 commit 以降の変更ファイル
 
-Produce a concise verification report:
+## 出力フォーマット
 
+```text
+VERIFICATION: PASS / FAIL
+
+Build:    OK / FAIL
+Types:    OK / N errors
+Lint:     OK / N issues
+Tests:    X/Y passed, Z% coverage
+Secrets:  OK / N found
+Debug:    OK / N occurrences
+Git:      <dirty status 要約>
+
+Ready for PR: YES / NO
 ```
-VERIFICATION: [PASS/FAIL]
 
-Build:    [OK/FAIL]
-Types:    [OK/X errors]
-Lint:     [OK/X issues]
-Tests:    [X/Y passed, Z% coverage]
-Secrets:  [OK/X found]
-Logs:     [OK/X console.logs]
-
-Ready for PR: [YES/NO]
-```
-
-If any critical issues, list them with fix suggestions.
-
-## Arguments
-
-$ARGUMENTS can be:
-- `quick` - Only build + types
-- `full` - All checks (default)
-- `pre-commit` - Checks relevant for commits
-- `pre-pr` - Full checks plus security scan
+CRITICAL は行ごとに修正候補を添える。

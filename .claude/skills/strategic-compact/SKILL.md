@@ -1,41 +1,41 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: 任意タイミングで走る auto-compaction ではなく、論理的な区切りで手動 /compact を促すことで、タスクフェーズ間のコンテキストを保全する
 ---
 
 # Strategic Compact Skill
 
-Suggests manual `/compact` at strategic points in your workflow rather than relying on arbitrary auto-compaction.
+任意タイミングの auto-compaction に任せるのではなく、ワークフローの戦略的ポイントで手動 `/compact` を促す。
 
-## Why Strategic Compaction?
+## なぜ戦略的 Compaction が必要か
 
-Auto-compaction triggers at arbitrary points:
-- Often mid-task, losing important context
-- No awareness of logical task boundaries
-- Can interrupt complex multi-step operations
+auto-compaction は任意のタイミングで発火する:
+- しばしばタスクの途中で走り、重要なコンテキストを失う
+- 論理的なタスク境界を認識できない
+- 複雑なマルチステップ操作を中断しうる
 
-Strategic compaction at logical boundaries:
-- **After exploration, before execution** - Compact research context, keep implementation plan
-- **After completing a milestone** - Fresh start for next phase
-- **Before major context shifts** - Clear exploration context before different task
+論理的な区切りで行う戦略的 compaction:
+- **調査のあと、実行の前** - 調査コンテキストを compact し、実装プランは残す
+- **マイルストーン完了のあと** - 次フェーズを新しい状態で始める
+- **大きなコンテキスト切り替えの前** - 別タスクに入る前に探索コンテキストを整理する
 
-## How It Works
+## 仕組み
 
-The `suggest-compact.sh` script runs on PreToolUse (Edit/Write) and:
+`suggest-compact.sh` スクリプトは PreToolUse (Edit/Write) で動作し、以下を行う:
 
-1. **Tracks tool calls** - Counts tool invocations in session
-2. **Threshold detection** - Suggests at configurable threshold (default: 50 calls)
-3. **Periodic reminders** - Reminds every 25 calls after threshold
+1. **tool 呼び出しを追跡する** - セッション内の tool 呼び出し回数をカウント
+2. **閾値検出** - 設定可能な閾値（デフォルト 50 回）で提案を出す
+3. **周期的リマインダー** - 閾値到達後は 25 回ごとに再通知
 
-## Hook Setup
+## Hook の設定
 
-Add to your `~/.claude/settings.json`:
+`~/.claude/settings.json` に以下を追加:
 
 ```json
 {
   "hooks": {
     "PreToolUse": [{
-      "matcher": "tool == \"Edit\" || tool == \"Write\"",
+      "matcher": "Edit|Write",
       "hooks": [{
         "type": "command",
         "command": "~/.claude/skills/strategic-compact/suggest-compact.sh"
@@ -45,19 +45,29 @@ Add to your `~/.claude/settings.json`:
 }
 ```
 
-## Configuration
+Claude Code の hooks matcher は正規表現 (`Edit|Write`) を取る。古い例では `tool == "Edit" || tool == "Write"` 形式を見かけるが、現行仕様は regex 形式を使うこと。
 
-Environment variables:
-- `COMPACT_THRESHOLD` - Tool calls before first suggestion (default: 50)
+## 設定
+
+環境変数:
+- `COMPACT_THRESHOLD` - 最初の提案までの tool 呼び出し回数（デフォルト 50）
+
+## Counter State と `/compact` 後のリセット
+
+`suggest-compact.sh` は `/tmp/claude-tool-count-<session-id>` にカウンタを保存する。
+
+- **セッション境界**: 新セッションを始めたら手動で `rm /tmp/claude-tool-count-*` するか、次の再起動で自動的に古いファイルは掃除される（OS 依存、tmp cleanup の扱い）。
+- **`/compact` 後のリセット**: `/compact` 自体はこのカウンタをリセットしない。リセットしたい場合は `rm /tmp/claude-tool-count-*` を実行するか、shell alias として `alias compact-reset='rm -f /tmp/claude-tool-count-* && echo reset'` を登録する。
+- **古い `$$` 実装**: 以前は `/tmp/claude-tool-count-$$` を使っていたが、hook は呼び出しごとに新プロセスで起動するため PID が毎回変わり、カウンタが常に 1 にリセットされてしまう既知バグがあった。現行は session id ベース。
 
 ## Best Practices
 
-1. **Compact after planning** - Once plan is finalized, compact to start fresh
-2. **Compact after debugging** - Clear error-resolution context before continuing
-3. **Don't compact mid-implementation** - Preserve context for related changes
-4. **Read the suggestion** - The hook tells you *when*, you decide *if*
+1. **計画後に compact する** - プラン確定後は compact して新しい状態で始める
+2. **デバッグ後に compact する** - エラー解決のコンテキストを整理してから次へ進む
+3. **実装の途中では compact しない** - 関連変更のためにコンテキストを保持する
+4. **提案を読む** - hook は *いつ* を教え、*実行するか* は自分で判断する
 
-## Related
+## 関連
 
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Token optimization section
-- Memory persistence hooks - For state that survives compaction
+- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - トークン最適化の節
+- メモリ永続化 hook - compaction を跨いで残すべき状態向け

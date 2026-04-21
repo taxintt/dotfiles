@@ -1,113 +1,83 @@
 ---
-description: Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code.
+description: 要件を整理し、リスクを評価し、段階的な実装計画を作成する。ユーザーが明示的に承認するまでコードを書かない
 ---
 
 # Plan Command
 
-This command invokes the **planner** agent to create a comprehensive implementation plan before writing any code.
+このコマンドは **planner** エージェントを呼び出し、コードを書く前に要件・リスク・段階計画を整理する。**ユーザーが承認するまでコードには触れない**。
 
-## What This Command Does
+## 動作
 
-1. **Restate Requirements** - Clarify what needs to be built
-2. **Identify Risks** - Surface potential issues and blockers
-3. **Create Step Plan** - Break down implementation into phases
-4. **Wait for Confirmation** - MUST receive user approval before proceeding
+1. **要件の言い直し** — 実装すべきものを明確化
+2. **リスクの抽出** — 潜在的なブロッカーを表面化
+3. **段階計画の作成** — フェーズ単位で分解
+4. **承認待ち** — 以下のホワイトリストに一致する応答を受け取るまで待機
 
-## When to Use
+承認ホワイトリスト: `yes` / `ok` / `proceed` / `go` / `approve` / 「承認」 / 「進めて」。それ以外は再確認する。
 
-Use `/plan` when:
-- Starting a new feature
-- Making significant architectural changes
-- Working on complex refactoring
-- Multiple files/components will be affected
-- Requirements are unclear or ambiguous
+変更依頼のプロトコル:
+- `modify: <変更内容>` — 計画を修正
+- `different approach: <代替案>` — 方針転換
+- `skip phase N` / `reorder: N, M, ...` — フェーズ操作
 
-## How It Works
+## 使うタイミング
 
-The planner agent will:
+- 新機能の開始
+- 大きなアーキテクチャ変更
+- 複雑なリファクタ
+- 複数ファイル / コンポーネントに跨る変更
+- 要件が曖昧なとき
 
-1. **Analyze the request** and restate requirements in clear terms
-2. **Break down into phases** with specific, actionable steps
-3. **Identify dependencies** between components
-4. **Assess risks** and potential blockers
-5. **Estimate complexity** (High/Medium/Low)
-6. **Present the plan** and WAIT for your explicit confirmation
+## 動作（planner エージェントが行うこと）
 
-## Example Usage
+1. リクエストを分析し、要件を明文化
+2. フェーズ単位で分解（各フェーズは具体的アクションに）
+3. コンポーネント間の依存を特定
+4. リスクとブロッカーを評価
+5. 複雑度を見積もる（High / Medium / Low）
+6. 計画を提示して**承認を待つ**
 
-```
-User: /plan I need to add real-time notifications when markets resolve
+## 出力フォーマット
 
-Agent (planner):
-# Implementation Plan: Real-Time Market Resolution Notifications
+```text
+# Implementation Plan: <タイトル>
 
 ## Requirements Restatement
-- Send notifications to users when markets they're watching resolve
-- Support multiple notification channels (in-app, email, webhook)
-- Ensure notifications are delivered reliably
-- Include market outcome and user's position result
+- <要件 1>
+- <要件 2>
 
 ## Implementation Phases
 
-### Phase 1: Database Schema
-- Add notifications table with columns: id, user_id, market_id, type, status, created_at
-- Add user_notification_preferences table for channel preferences
-- Create indexes on user_id and market_id for performance
+### Phase 1: <名前>
+- <アクション 1>
+- <アクション 2>
 
-### Phase 2: Notification Service
-- Create notification service in lib/notifications.ts
-- Implement notification queue using BullMQ/Redis
-- Add retry logic for failed deliveries
-- Create notification templates
-
-### Phase 3: Integration Points
-- Hook into market resolution logic (when status changes to "resolved")
-- Query all users with positions in market
-- Enqueue notifications for each user
-
-### Phase 4: Frontend Components
-- Create NotificationBell component in header
-- Add NotificationList modal
-- Implement real-time updates via Supabase subscriptions
-- Add notification preferences page
+### Phase 2: <名前>
+...
 
 ## Dependencies
-- Redis (for queue)
-- Email service (SendGrid/Resend)
-- Supabase real-time subscriptions
+- <外部サービス / ライブラリ / 既存モジュール>
 
 ## Risks
-- HIGH: Email deliverability (SPF/DKIM required)
-- MEDIUM: Performance with 1000+ users per market
-- MEDIUM: Notification spam if markets resolve frequently
-- LOW: Real-time subscription overhead
+- HIGH: <リスク>
+- MEDIUM: <リスク>
+- LOW: <リスク>
 
-## Estimated Complexity: MEDIUM
-- Backend: 4-6 hours
-- Frontend: 3-4 hours
-- Testing: 2-3 hours
-- Total: 9-13 hours
+## Estimated Complexity: HIGH / MEDIUM / LOW
 
-**WAITING FOR CONFIRMATION**: Proceed with this plan? (yes/no/modify)
+**WAITING FOR CONFIRMATION**: 上記プランで進めてよいか？
 ```
 
-## Important Notes
+## 重要事項
 
-**CRITICAL**: The planner agent will **NOT** write any code until you explicitly confirm the plan with "yes" or "proceed" or similar affirmative response.
+**計画が承認されるまでコードは書かない**。planner エージェントへの呼び出しプロンプトに、上記ホワイトリスト・変更プロトコルを明示すること。
 
-If you want changes, respond with:
-- "modify: [your changes]"
-- "different approach: [alternative]"
-- "skip phase 2 and do phase 3 first"
+## 他コマンドとの連携
 
-## Integration with Other Commands
+- `/ts-tdd` / `/go-tdd` — 承認後、TDD で実装
+- `/go-build` — Go プロジェクトでビルドエラーが出た場合
+- `/code-review` / `/go-review` — 実装後のレビュー
 
-After planning:
-- Use `/tdd` to implement with test-driven development
-- Use `/build-and-fix` if build errors occur
-- Use `/code-review` to review completed implementation
+## 関連
 
-## Related Agents
-
-This command invokes the `planner` agent located at:
-`~/.claude/agents/planner.md`
+- Agent: `~/.claude/agents/planner.md`

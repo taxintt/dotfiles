@@ -1,62 +1,37 @@
 ---
-description: "変更内容を分析して適切なブランチ名を考えて、ブランチを作成します"
+description: "変更内容を分析して適切なブランチ名を考え、ブランチを作成する"
+argument-hint: "[-d] [-p <prefix>] [description]"
 ---
 
 ## 引数
 
-$ARGUMENTS
+`$ARGUMENTS` を空白で分割し、先頭から順に以下のオプションを解釈する。残余はブランチ名の候補説明として扱う。
 
-## オプション
-
-- `-d`, `--dry-run`: ブランチを実際に作成せず、提案のみ行う
-- `-p`, `--prefix <type>`: ブランチのプレフィックスを指定（feature, fix, hotfix, release, chore）
+- `-d`, `--dry-run`: ブランチを作成せず、提案のみ行う
+- `-p <type>`, `--prefix <type>`: ブランチのプレフィックスを指定（feature / fix / hotfix / release / chore）
 
 ## Instructions
 
-次の手順に従って深く考えてブランチを作成してください。
+1. **現状確認**
+   - `git status` / `git branch -a` で現在のブランチと既存ブランチ一覧を取得
+   - 同名・類似ブランチが無いかを確認
+   - 現在 main / master にいる場合は、当該ブランチの remote から pull して最新化（`git pull origin $(git rev-parse --abbrev-ref HEAD)`）
 
-1. **現在の状況を確認**
-   - `git status` で現在のブランチと変更状況を確認
-   - `git branch -a` で既存のブランチ一覧を確認
-   - 同名または類似のブランチが存在しないかチェック
-   - **main/masterブランチの場合**: `git pull origin main` で最新化してからブランチを作成する
-
-2. **変更内容を分析**
-   - ステージングされた変更、または作業ディレクトリの変更内容を確認
-   - 変更の目的と種類を特定（新機能、バグ修正、リファクタリングなど）
+2. **変更内容の分析**
+   - staged / unstaged の差分を確認し、変更の種類（新機能 / バグ修正 / リファクタ等）を特定
+   - 推論できない場合はユーザーに prefix と説明を確認する（推測禁止）
 
 3. **ブランチ名の決定**
-   - [Conventional Branch](https://conventional-branch.github.io/) に従った命名を行う
-   - プレフィックスは変更の種類に応じて選択：
-     - `feature/`: 新機能追加
-     - `fix/`: バグ修正
-     - `hotfix/`: 緊急修正
-     - `release/`: リリース準備
-     - `chore/`: メンテナンス作業
-   - 形式: `<prefix>/<簡潔な機能説明>`
-   - 日本語は使用せず、ケバブケース（kebab-case）で記述
+   - [Conventional Branch](https://conventional-branch.github.io/) に従い、形式は `<prefix>/<簡潔な説明>`
+   - prefix: `feature/` / `fix/` / `hotfix/` / `release/` / `chore/`
+   - 説明部分はケバブケース（kebab-case）、日本語不可、50 文字以内
+   - チケット番号がある場合は `feature/TICKET-123-add-login` のように含める
+   - `--prefix` 指定があればそれを優先
 
 4. **ブランチの作成**
-   - `--dry-run` オプションがある場合は、提案のみ行い作成しない
-   - `--prefix` オプションがある場合は、指定されたプレフィックスを使用
-   - `git checkout -b <branch-name>` でブランチを作成
+   - `--dry-run` 指定時は提案のみ
+   - それ以外は `git switch -c <branch-name>` で作成
 
 5. **結果の報告**
-   - 作成したブランチ名と、その名前を選んだ理由を説明
-   - 必要に応じて、代替案も提示
-
-## Notes
-
-- 既に存在するブランチ名は避ける
-- 長すぎるブランチ名は避け、50文字以内を目安にする
-- チケット番号がある場合は `feature/TICKET-123-add-login` のように含める
-
-## Examples
-
-```
-feature/add-user-authentication
-fix/resolve-login-timeout-issue
-hotfix/security-patch-xss
-chore/update-dependencies
-release/v1.2.0
-```
+   - 作成したブランチ名と命名理由を提示
+   - 代替案が有意ならあわせて提示

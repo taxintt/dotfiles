@@ -1,172 +1,120 @@
-# Orchestrate Command
+---
+description: 複雑タスクを複数エージェントの順次連鎖で実行する。workflow 種別に応じて agent を直列呼び出しし、handoff でコンテキストを受け渡す
+argument-hint: "<workflow-type> <task-description>"
+---
 
-Sequential agent workflow for complex tasks.
+# /orchestrate
 
-## Usage
+複雑タスクを事前定義された agent 連鎖で実行する。
 
-`/orchestrate [workflow-type] [task-description]`
+## 引数
 
-## Workflow Types
+`$ARGUMENTS` は `<workflow-type> <task-description>` 形式で解釈する。
 
-### feature
-Full feature implementation workflow:
-```
-planner -> tdd-guide -> code-reviewer -> security-reviewer
-```
+- `feature <desc>` — 機能実装
+- `bugfix <desc>` — バグ調査 + 修正
+- `refactor <desc>` — リファクタリング
+- `security <desc>` — セキュリティレビュー
+- `custom <agents> <desc>` — カスタム連鎖（`agents` はカンマ区切り、例: `architect,tdd-guide,code-reviewer`）
 
-### bugfix
-Bug investigation and fix workflow:
-```
-explorer -> tdd-guide -> code-reviewer
-```
+## workflow 種別と agent 連鎖
 
-### refactor
-Safe refactoring workflow:
-```
-architect -> code-reviewer -> tdd-guide
-```
+| 種別 | 連鎖 |
+|------|------|
+| feature | planner → tdd-guide → code-reviewer → security-reviewer |
+| bugfix | planner → tdd-guide → code-reviewer |
+| refactor | architect → tdd-guide → code-reviewer |
+| security | security-reviewer → code-reviewer → architect |
 
-### security
-Security-focused review:
-```
-security-reviewer -> code-reviewer -> architect
-```
+深い調査が必要なら、planner の前に Task ツールで `subagent_type=Explore` を起動して調査結果を持ち込むこと。
 
-## Execution Pattern
+## 実行パターン
 
-For each agent in the workflow:
+各 agent に対して次を繰り返す:
 
-1. **Invoke agent** with context from previous agent
-2. **Collect output** as structured handoff document
-3. **Pass to next agent** in chain
-4. **Aggregate results** into final report
+1. **agent 起動** — 前段の handoff を context として渡す
+2. **出力を収集** — 構造化 handoff ドキュメントとして保持
+3. **次の agent に渡す**
+4. **最終 agent は Final Report を生成**
 
-## Handoff Document Format
+中間の受け渡しは HANDOFF 形式、最終成果物のみ Final Report 形式。ファイル化はせず、会話上のメッセージとして扱う。
 
-Between agents, create handoff document:
+## HANDOFF フォーマット（中間）
 
 ```markdown
-## HANDOFF: [previous-agent] -> [next-agent]
+## HANDOFF: <previous-agent> → <next-agent>
 
 ### Context
-[Summary of what was done]
+<前段の作業要約>
 
 ### Findings
-[Key discoveries or decisions]
+<鍵となる発見 / 決定>
 
 ### Files Modified
-[List of files touched]
+<変更ファイル一覧>
 
 ### Open Questions
-[Unresolved items for next agent]
+<次の agent に委ねる未解決事項>
 
 ### Recommendations
-[Suggested next steps]
+<次のアクション候補>
 ```
 
-## Example: Feature Workflow
+## Final Report フォーマット（最終）
 
-```
-/orchestrate feature "Add user authentication"
-```
-
-Executes:
-
-1. **Planner Agent**
-   - Analyzes requirements
-   - Creates implementation plan
-   - Identifies dependencies
-   - Output: `HANDOFF: planner -> tdd-guide`
-
-2. **TDD Guide Agent**
-   - Reads planner handoff
-   - Writes tests first
-   - Implements to pass tests
-   - Output: `HANDOFF: tdd-guide -> code-reviewer`
-
-3. **Code Reviewer Agent**
-   - Reviews implementation
-   - Checks for issues
-   - Suggests improvements
-   - Output: `HANDOFF: code-reviewer -> security-reviewer`
-
-4. **Security Reviewer Agent**
-   - Security audit
-   - Vulnerability check
-   - Final approval
-   - Output: Final Report
-
-## Final Report Format
-
-```
+```markdown
 ORCHESTRATION REPORT
 ====================
-Workflow: feature
-Task: Add user authentication
-Agents: planner -> tdd-guide -> code-reviewer -> security-reviewer
+Workflow: <type>
+Task: <description>
+Agents: <chain>
 
 SUMMARY
 -------
-[One paragraph summary]
+<1 段落の総括>
 
 AGENT OUTPUTS
 -------------
-Planner: [summary]
-TDD Guide: [summary]
-Code Reviewer: [summary]
-Security Reviewer: [summary]
+<各 agent の要約>
 
 FILES CHANGED
 -------------
-[List all files modified]
+<変更ファイル>
 
 TEST RESULTS
 ------------
-[Test pass/fail summary]
+<テスト成否>
 
 SECURITY STATUS
 ---------------
-[Security findings]
+<セキュリティ所見>
 
 RECOMMENDATION
 --------------
-[SHIP / NEEDS WORK / BLOCKED]
+SHIP / NEEDS WORK / BLOCKED
 ```
 
-## Parallel Execution
+## 並列実行（オプション）
 
-For independent checks, run agents in parallel:
+ユーザーが明示的に「並列で」と指示した場合、または独立性が明らかな場合のみ並列化できる:
 
 ```markdown
 ### Parallel Phase
-Run simultaneously:
-- code-reviewer (quality)
-- security-reviewer (security)
-- architect (design)
+以下を同時起動:
+- code-reviewer（品質）
+- security-reviewer（セキュリティ）
+- architect（設計）
 
-### Merge Results
-Combine outputs into single report
+### Merge
+結果を統合して単一レポートにする
 ```
 
-## Arguments
+暗黙の並列化は禁止（コンテキスト齟齬の温床）。
 
-$ARGUMENTS:
-- `feature <description>` - Full feature workflow
-- `bugfix <description>` - Bug fix workflow
-- `refactor <description>` - Refactoring workflow
-- `security <description>` - Security review workflow
-- `custom <agents> <description>` - Custom agent sequence
+## 運用のヒント
 
-## Custom Workflow Example
-
-```
-/orchestrate custom "architect,tdd-guide,code-reviewer" "Redesign caching layer"
-```
-
-## Tips
-
-1. **Start with planner** for complex features
-2. **Always include code-reviewer** before merge
-3. **Use security-reviewer** for auth/payment/PII
-4. **Keep handoffs concise** - focus on what next agent needs
-5. **Run verification** between agents if needed
+- 複雑機能は **planner で開始**
+- merge 前に **code-reviewer を必ず含める**
+- 認証 / 決済 / PII を触るなら **security-reviewer を必ず含める**
+- HANDOFF は簡潔に：次の agent が必要なものだけ
+- agent 間で検証（テスト / ビルド）を挟むと齟齬を早く検知できる

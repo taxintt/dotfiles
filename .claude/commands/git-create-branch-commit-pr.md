@@ -1,15 +1,13 @@
 ---
-description: "変更内容を分析して、ブランチ作成 ~ コミットの作成 ~ プルリクエストの作成までを一気通貫で行います"
+description: 変更内容を分析し、ブランチ作成 → コミット作成 → プルリクエスト作成までを一気通貫で行う
 ---
-
-## 引数
-
-$ARGUMENTS
-
-## オプション
 
 ## Instructions
 
-1. Read @~/.claude/commands/branch.md を実行
-2. Read @~/.claude/commands/commit.md を実行
-3. Read @~/.claude/commands/pull-reuqest.md を実行
+次の 3 コマンドを順次実行する。いずれかで失敗した場合は停止してユーザーに報告する。
+
+1. `/branch` を実行
+2. `/commit` を実行
+3. `/pull-request` を実行
+
+各コマンドは `@.claude/commands/<name>.md` に定義されたルールに従う。オプションを渡す必要がある場合は `$ARGUMENTS` から分配する。

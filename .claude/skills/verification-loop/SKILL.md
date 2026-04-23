@@ -1,6 +1,6 @@
 ---
 name: verification-loop
-description: PR 作成前にビルド / 型チェック / lint / テスト / セキュリティを網羅的に検証するシステム
+description: PR / commit 作成前にビルド / 型チェック / lint / テスト / シークレット / デバッグ文 / git 状態を網羅的に検証する。ユーザーが「検証して」「PR 前チェックして」と依頼したとき、または `/verify` として呼ばれたときに起動する
 ---
 
 # Verification Loop Skill
@@ -12,8 +12,21 @@ Claude Code セッション向けの包括的な検証システム。
 以下の場面でこの skill を起動する:
 - 機能実装や大きなコード変更の完了後
 - PR 作成の直前
+- commit 前の品質ゲート
 - 品質ゲートの通過を確認したいとき
 - リファクタリングの直後
+- ユーザーが明示的に `/verify` と呼んだとき
+
+## Modes
+
+引数で実行する Phase を絞れる:
+
+| モード | 実行 Phase | 用途 |
+|---|---|---|
+| `quick` | 1, 2 | 変更後の即時チェック |
+| `full`（デフォルト） | 1-6 すべて | 一般的な包括検証 |
+| `pre-commit` | 1, 2, 3, 5, 6 | コミット直前（テスト除く） |
+| `pre-pr` | 1-6 + git status | PR 作成直前の完全検証 |
 
 ## Verification Phases
 
@@ -46,12 +59,20 @@ npm run test -- --coverage 2>&1 | tail -50
 **PASS/FAIL**: failed = 0 **かつ** coverage >= 80% → PASS。いずれか欠けたら FAIL。Report:
 - Total tests: X / Passed: X / Failed: X / Coverage: X%
 
-### Phase 5: Security Scan
+### Phase 5: Security & Debug Statement Scan
 ```bash
+# Secrets
 grep -rn "sk-\|api_key\|AKIA[0-9A-Z]\{16\}" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
-grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
+
+# Debug statements（言語別）
+grep -rn "console.log\|console.debug" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" src/ 2>/dev/null | head -10   # JS/TS
+grep -rn "fmt.Println\|log.Println" --include="*.go" . 2>/dev/null | head -10                                                              # Go (log パッケージ運用例外を除く)
+grep -rn "^\s*print(" --include="*.py" . 2>/dev/null | head -10                                                                             # Python
+
+# 秘匿ファイルの staging 状態
+git diff --cached --name-only | grep -E "\.env|credentials\.json|id_rsa" | head -5
 ```
-**PASS/FAIL**: secret 系 hit = 0 → PASS。`console.log` は warnings 扱いで Issues to Fix へ。人間判定が必要な誤検出は除外可（理由を Report に記載）。
+**PASS/FAIL**: secret 系 hit = 0 **かつ** 秘匿ファイル staged = 0 → PASS。debug 文は warnings 扱いで Issues to Fix へ（test ファイルは除外可）。人間判定が必要な誤検出は除外可（理由を Report に記載）。
 
 ### Phase 6: Diff Review
 ```bash
@@ -111,9 +132,9 @@ Issues to Fix:
 - 各関数の完成時
 - 各コンポーネントの完成時
 - 次タスクに進む前
-
-実行: /verify
 ```
+
+各チェックポイントで、mode に応じて `quick` → `full` → `pre-pr` と段階を上げていく。
 
 ## Hook との統合
 

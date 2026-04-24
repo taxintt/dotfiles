@@ -9,7 +9,7 @@
 ```
 
 Conventional Commits prefixは任意。直近のコミットログでprefixが使われていればスタイルを合わせる。
-詳細なルールは `commit.md` スキルを参照。
+詳細なルールは `git-commit` skill を参照。
 
 Note: Attribution disabled globally via ~/.claude/settings.json.
 

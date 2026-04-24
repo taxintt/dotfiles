@@ -265,6 +265,48 @@ func TestFileProcessing(t *testing.T) {
 - Mock everything (prefer integration tests when possible)
 - Skip error path testing
 
+## Verify RED / GREEN を省略しない
+
+TDD の Iron Law（`tdd-workflow` skill 参照）は Go でも同じ:
+
+- `panic("not implemented")` stub を置いたら、**実装前に `go test` を実行して panic で落ちることを目で確認する**
+- `errNotImplemented` stub を置いたら、**テストが `err = not implemented` で落ちることを確認する**
+- 「Go は compile error も RED 扱い」という通説があるが、**compile error では「何を検証しているか」が曖昧**。可能な限り runtime failure の RED を見る
+
+## Red Flags — TDD を破っているサイン
+
+下記に当てはまったら **削除して RED からやり直し**:
+
+- [ ] テストを書く前に実装を書いた（「参考程度に」も禁止）
+- [ ] RED を目で見ていない（書いた瞬間 pass してしまった）
+- [ ] `time.Sleep()` で待機している（channel / condition を使う）
+- [ ] test-only な関数を production に足した（`_forTest` suffix 等）
+- [ ] mock 設定がテストの 50% 以上を占める
+- [ ] mock を削除するとテストが failing する（= mock の振る舞いをテストしている）
+- [ ] なぜこの mock が必要か 1 文で説明できない
+- [ ] 非公開関数を直接テストしている（public API 経由に変更）
+- [ ] テストが互いに依存している（実行順序で結果が変わる）
+- [ ] flaky test を「再実行で通ることもある」と放置している
+
+詳細は `tdd-workflow/testing-anti-patterns.md` を併読。バグ修正時は `tdd-workflow/regression-testing.md` の逆フェーズ検証を必須とする。
+
+## Verification Checklist (コミット前)
+
+Go テストを commit / PR に含める前に:
+
+- [ ] 各関数について、**失敗するテストを先に書いた**
+- [ ] 実装前に **RED を目で確認した**（stub / panic / errNotImplemented で落ちることを確認）
+- [ ] テストを pass させる **最小コード** を書いた（over-engineering していない）
+- [ ] `go test -v` で全テストが pass
+- [ ] `go test -cover` で 80%+ のカバレッジ
+- [ ] `go test -race` で race condition なし
+- [ ] `time.Sleep()` を使っていない
+- [ ] 非公開関数を直接テストしていない
+- [ ] Table-driven が適用可能な場所で使っている
+- [ ] Subtest で `tt := tt` キャプチャしている（parallel の場合）
+- [ ] 各テストが独立している（shared state 無し）
+- [ ] バグ修正 PR なら逆フェーズ検証（修正 revert → FAIL）まで実施済み
+
 ## 補助ドキュメント
 
 詳細パターンが必要なときのみ読む:

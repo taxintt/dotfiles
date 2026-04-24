@@ -60,7 +60,7 @@ $ go test
 --- FAIL: TestValidatePassword_ShortIsInvalid
     want=false got=true
 ```
-✓ 期待通り失敗
+期待通り失敗している。
 
 **Step 2: 修正**
 ```go
@@ -74,7 +74,7 @@ if len(pwd) < 8 {
 $ go test
 PASS
 ```
-✓ 修正が効いている
+修正が効いている。
 
 **Step 4: 逆フェーズ — 修正を revert**
 
@@ -90,7 +90,7 @@ $ go test
 --- FAIL: TestValidatePassword_ShortIsInvalid
     want=false got=true
 ```
-✓ **テストが本当にバグを検知していることが証明された**
+**テストが本当にバグを検知していることが証明された**。
 
 **Step 5: 修正を restore**
 ```go

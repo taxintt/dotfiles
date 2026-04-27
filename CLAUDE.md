@@ -1,45 +1,35 @@
-# Core Philosophy
+# Personal Coding Conventions
 
-## 基本原則
-- **Agent-First**: 複雑なタスクは `.claude/agents/` の専門エージェントに委譲
-- **Plan Before Execute**: 複数ファイル変更や不慣れなコードにはPlan Modeを使用
-- **TDD**: テスト先行開発 (RED → GREEN → REFACTOR)
-- **Security-First**: コミット前に必ずセキュリティチェック
-- **YAGNI, KISS, DRY**: ユーザーからの指示がない限り、いたずらに行数を増やさずにシンプルに実装
-- **Latest feature**: より最新の書き方や最新の機能を使って、後方互換を考慮する必要はない
+## Core principles (non-negotiable)
+- 質問には質問で答える / 推測禁止 / 出来ないことは「出来ない」と明言
+- 最小限の実装 — 依頼外のリファクタ・機能追加・ドキュメント追加禁止
+- 既存パターン踏襲 / フォールバック禁止 (発生しないシナリオへの過剰防御)
+- TDD: RED → GREEN → REFACTOR
+- Latest feature 優先、後方互換は不要
+- デバッグコード残置禁止 (PostToolUse hook が検出)
+- 批判的思考: 技術的に問題のある提案は理由を添えて代替案を出す
 
-## 振る舞い制御
+## Where to look (pointer design)
 
-### 誠実性と対話
-- **質問には質問で答える**: ユーザーが質問したとき（特に疑問符で終わっているとき）は、勝手に作業を開始せず、質問に答える
-- **出来ないことは明言する**: 技術的に不可能なことや実装困難なことは「出来ない」「不可能です」と正直に返答
-- **推測を禁止**: 不明な点や曖昧な要件がある場合は推測で進めず、必ずユーザーに質問して確認する
-- **批判的思考**: ユーザーの提案や指示が技術的に問題がある場合は無条件に受け入れず、理由を説明し代替案を提示する
+自動化された規約 (settings.json hooks):
+- PostToolUse — gofmt / golangci-lint / terraform fmt / tflint
+- Stop — go test / terraform validate gate
+- PreToolUse — destructive command + tfstate edit guard
+- PreCompact — ADR / progress / git state preservation
 
-### 実装の制約
-- **最小限の変更**: 依頼された機能のみを実装し、勝手に機能追加・リファクタリング・ドキュメント追加をしない
-- **既存パターンの踏襲**: 新規実装時は既存のコードベースのパターンとスタイルに従う
-- **フォールバック禁止**: 発生しないシナリオに対するエラー処理、フォールバック、または検証を追加しない
+skill / agent カタログ:
+- skill 一覧 → `~/.claude/skills/*/SKILL.md`
+- agent 一覧 → `~/.claude/agents/*.md` frontmatter
 
-# Rules
+ドメイン別ポインタ:
+- Terraform 検証 → `terraform-validation` skill
+- Go 規約・ビルド・テスト → `golang-patterns` / `golang-testing` / `golang-build-fixing` skill
+- セキュリティ応答 → `security-reviewer` agent + `.claude/rules/security.md`
+- リサーチ手法 → `.claude/rules/research.md` + `iterative-retrieval` / `obsidian-context` skill
+- ADR → 各リポジトリの `docs/adr/`
+- アーカイブ済みルール (1 週間試用後削除予定) → `.claude/rules/_archive/`
 
-詳細なルールは以下のファイルを参照：
-
-## コンテキスト別の振る舞い
-@.claude/rules/dev.md - 開発モード（実装重視、TDD必須）
-@.claude/rules/research.md - 調査モード（理解優先、推測禁止）
-@.claude/rules/review.md - レビューモード（品質・セキュリティ重視）
-
-## ワークフロー・スタイル
-@.claude/rules/git-workflow.md
-@.claude/rules/coding-style.md
-@.claude/rules/testing.md
-
-## セキュリティ・品質
+## Active expanded rules
 @.claude/rules/security.md
-@.claude/rules/performance.md
+@.claude/rules/research.md
 @.claude/rules/patterns.md
-
-## システム
-@.claude/rules/agents.md
-@.claude/rules/hooks.md

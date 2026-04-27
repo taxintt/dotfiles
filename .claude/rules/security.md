@@ -1,36 +1,19 @@
 # Security Guidelines
 
-## Mandatory Security Checks
+## Pre-commit checks (must pass)
+- No hardcoded secrets (API keys, passwords, tokens)
+- All user inputs validated at boundaries
+- SQL injection: parameterized queries only
+- XSS: sanitized HTML output
+- AuthN/AuthZ: verified for every protected path
+- Error messages: no sensitive-data leakage
 
-Before ANY commit:
-- [ ] No hardcoded secrets (API keys, passwords, tokens)
-- [ ] All user inputs validated
-- [ ] SQL injection prevention (parameterized queries)
-- [ ] XSS prevention (sanitized HTML)
-- [ ] CSRF protection enabled
-- [ ] Authentication/authorization verified
-- [ ] Rate limiting on all endpoints
-- [ ] Error messages don't leak sensitive data
+## Secret rule
+- Never hardcode. Read from env vars; throw at startup if absent.
 
-## Secret Management
-
-```typescript
-// NEVER: Hardcoded secrets
-const apiKey = "sk-proj-xxxxx"
-
-// ALWAYS: Environment variables
-const apiKey = process.env.OPENAI_API_KEY
-
-if (!apiKey) {
-  throw new Error('OPENAI_API_KEY not configured')
-}
-```
-
-## Security Response Protocol
-
-If security issue found:
-1. STOP immediately
-2. Use **security-reviewer** agent
-3. Fix CRITICAL issues before continuing
-4. Rotate any exposed secrets
-5. Review entire codebase for similar issues
+## Incident protocol
+1. STOP — do not push, do not commit further
+2. Hand off to `security-reviewer` agent
+3. Fix CRITICAL issues first
+4. Rotate any exposed secret
+5. Sweep codebase for similar patterns

@@ -1,48 +1,19 @@
-# Research Context
+# Research Mode
 
-Mode: Exploration, investigation, learning
-Focus: Understanding before acting
+Goal: understand before acting. Don't write code until the question is clear.
 
-## Behavior
+## Hard rules
+- 推測禁止 — 不確かなら「不明」と明示
+- 仮説は「仮説」として明示、事実と分けて報告
+- 調査中はコード変更しない
 
-### 調査フロー
-- 広く読んでから結論を出す
-- **推測禁止**: 不確かな点は明確に「不明」と伝える
-- 調査結果は根拠とともに文書化
-- 理解が明確になるまでコードを書かない
+## Default tools
+- Explore agent — wide codebase sweeps
+- `iterative-retrieval` skill — narrow context for subagents
+- `obsidian-context` skill — pull from personal vault
+- Parallel Task agents — multi-angle analysis (security / perf / types)
 
-### エージェント活用
-- **Exploreエージェント**: コードベースの包括的な調査に使用
-- 複数の視点から分析（セキュリティ、パフォーマンス、型チェック）
-- 並列実行可能なタスクは同時に実行
-
-### コミュニケーション
-- **質問形式で返答**: ユーザーの質問には推測を含めず、事実ベースで答える
-- 不明点は「調査が必要です」と明言
-- 仮説は「仮説」として明示
-
-## Research Process
-1. 質問を正確に理解
-2. 関連コード・ドキュメントを調査
-3. 根拠に基づく仮説を形成
-4. エビデンスで検証
-5. 発見事項をまとめる
-
-## 禁止事項
-- ❌ 不確かな情報の断定
-- ❌ 調査不足での推測
-- ❌ 調査中の勝手なコード変更
-- ❌ 根拠のない推奨事項
-- ❌ ユーザーの質問に対して勝手に実装を開始
-
-## Tools to favor
-- Read - コードの理解
-- Grep, Glob - パターン検索
-- WebSearch, WebFetch - 外部ドキュメント
-- Task with Explore agent - コードベース調査
-- Task with parallel agents - 多角的分析
-
-## Output Format
-1. **調査結果**（事実とエビデンス）
-2. **推奨事項**（調査結果に基づく提案）
-3. **不明点**（追加調査が必要な項目）
+## Output sections
+1. 調査結果 (事実 + 根拠)
+2. 推奨事項 (調査結果に基づく)
+3. 不明点 (追加調査が必要な項目)

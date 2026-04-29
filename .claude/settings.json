@@ -116,16 +116,6 @@
           }
         ]
       }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/taxin/.claude/hooks/claude-notification.sh"
-          }
-        ]
-      }
     ]
   }
 }

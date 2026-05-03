@@ -1,55 +1,18 @@
-# Common Patterns
+# Personal Patterns
 
-## API Response Format
+## Skeleton-first for new projects
+When starting new functionality, prefer cloning a battle-tested skeleton over greenfield:
+1. Search for proven skeletons in the relevant ecosystem
+2. Run parallel agents to evaluate (security / extensibility / relevance / implementation cost)
+3. Clone the best match
+4. Iterate within the proven structure rather than redesigning
 
-```typescript
-interface ApiResponse<T> {
-  success: boolean
-  data?: T
-  error?: string
-  meta?: {
-    total: number
-    page: number
-    limit: number
-  }
-}
-```
+## When to use Plan Mode
+- Multi-file changes
+- Unfamiliar code area
+- Architectural choice with several reasonable options
 
-## Custom Hooks Pattern
+For trivial single-file edits, skip Plan Mode.
 
-```typescript
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay)
-    return () => clearTimeout(handler)
-  }, [value, delay])
-
-  return debouncedValue
-}
-```
-
-## Repository Pattern
-
-```typescript
-interface Repository<T> {
-  findAll(filters?: Filters): Promise<T[]>
-  findById(id: string): Promise<T | null>
-  create(data: CreateDto): Promise<T>
-  update(id: string, data: UpdateDto): Promise<T>
-  delete(id: string): Promise<void>
-}
-```
-
-## Skeleton Projects
-
-When implementing new functionality:
-1. Search for battle-tested skeleton projects
-2. Use parallel agents to evaluate options:
-   - Security assessment
-   - Extensibility analysis
-   - Relevance scoring
-   - Implementation planning
-3. Clone best match as foundation
-4. Iterate within proven structure
+## Parallel agents over serial
+Independent agent invocations in a single message run concurrently. Use this for: multi-angle reviews, broad exploration, multi-language linting, multi-dir test runs.

@@ -54,5 +54,68 @@
         "repo": "hashicorp/agent-skills"
       }
     }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/pre-tool-bash-guard.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/pre-tool-edit-guard.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/post-tool-go-lint.sh",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/post-tool-terraform-lint.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/stop-verify.sh",
+            "timeout": 90
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/taxin/.claude/hooks/pre-compact-preserve.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }

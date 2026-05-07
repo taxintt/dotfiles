@@ -4,6 +4,7 @@ description: Runs code review using Codex CLI (codex exec review). Use when the 
 argument-hint: "[--uncommitted | --base <branch> | --commit <sha>] [prompt]"
 allowed-tools: Bash
 disable-model-invocation: true
+model: haiku
 ---
 
 # Codex Review

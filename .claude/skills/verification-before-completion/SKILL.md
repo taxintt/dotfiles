@@ -1,6 +1,7 @@
 ---
 name: verification-before-completion
 description: 「完了」「修正済み」「テスト合格」「問題なし」と主張する直前、commit / PR 作成の直前に発火する。検証コマンドを fresh に実行し出力を確認した上でしか主張させない。`/verify-claim` として明示呼び出しされたときも起動する。
+model: sonnet
 ---
 
 # Verification Before Completion Skill

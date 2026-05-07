@@ -1,6 +1,7 @@
 ---
 name: session-pattern-extraction
 description: セッションで non-trivial な問題を解決した直後、将来の再利用価値を感じたとき、またはユーザーが `/learn` として明示呼び出ししたときに起動する。session から再利用可能なパターンを抽出し、ユーザー承認後に `~/.claude/skills/learned/` へ保存する。
+model: sonnet
 ---
 
 # Session Pattern Extraction Skill

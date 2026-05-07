@@ -1,6 +1,7 @@
 ---
 name: skill-create
 description: skill の新規作成、既存 skill の編集、デプロイ前の検証を行うときに使う。pressure scenario で baseline を観察していないなら発火する。
+model: opus
 ---
 
 # Skill Creation

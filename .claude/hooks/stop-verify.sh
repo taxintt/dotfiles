@@ -39,9 +39,12 @@ if [ -n "$tf_dirs" ] && command -v terraform >/dev/null 2>&1; then
     [ -d "$d/.terraform" ] || continue
     out="$(cd "$d" && timeout 20 terraform validate 2>&1 || true)"
     if printf '%s' "$out" | grep -qE '(Error:|Errors:)'; then
-      failures="${failures}
+      # "Module source has changed" は terraform init が必要な状態なのでブロックしない
+      if ! printf '%s' "$out" | grep -qF 'Module source has changed'; then
+        failures="${failures}
 == terraform validate failed in $d ==
 $(printf '%s' "$out" | head -20)"
+      fi
     fi
   done <<< "$tf_dirs"
 fi

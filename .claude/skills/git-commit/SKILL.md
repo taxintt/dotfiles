@@ -1,6 +1,7 @@
 ---
 name: git-commit
 description: 変更をコミットするとき、ユーザーが「コミットして」と依頼したとき、または `/commit` として明示呼び出しされたときに起動する。atomic 粒度と「なぜ」を書くメッセージ規約を強制し、main / master では中断する。
+model: haiku
 ---
 
 # Git Commit Skill

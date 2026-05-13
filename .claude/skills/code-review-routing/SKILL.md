@@ -1,6 +1,7 @@
 ---
 name: code-review-routing
 description: 未コミット変更に対する包括的レビュー。言語を検出して `code-reviewer` / `security-reviewer` agent または `golang-patterns` (Go) に振り分ける。`/code-review` として明示呼び出しされたときも起動する。
+model: sonnet
 ---
 
 # Code Review Routing Skill

@@ -1,6 +1,7 @@
 ---
 name: cleanup-dead-code
 description: JS / TS プロジェクトで不要なコード / 依存を削除したいとき、またはユーザーが `/cleanup-dead-code` として明示呼び出ししたときに起動する。knip / depcheck / ts-prune で検出し、テスト駆動で段階削除する。Go / Python など他言語には適用しない。
+model: sonnet
 ---
 
 # Cleanup Dead Code Skill

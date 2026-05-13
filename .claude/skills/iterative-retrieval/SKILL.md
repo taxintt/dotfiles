@@ -1,6 +1,7 @@
 ---
 name: iterative-retrieval
 description: コンテキスト取得を段階的に絞り込み、subagent のコンテキスト問題を解消するためのパターン
+model: opus
 ---
 
 # Iterative Retrieval パターン

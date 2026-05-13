@@ -1,6 +1,7 @@
 ---
 name: implementation-planning
 description: 新機能の開始、大きなアーキテクチャ変更、複雑リファクタ、複数ファイルに跨る変更など、要件が曖昧または広いタスクに取り組む前に起動する。planner エージェントを呼び出して段階計画を作成し、ユーザーが明示承認するまでコードを書かない。`/plan` として明示呼び出しされたときも起動する。
+model: sonnet
 ---
 
 # Implementation Planning Skill

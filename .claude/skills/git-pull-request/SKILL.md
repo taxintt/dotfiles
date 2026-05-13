@@ -1,6 +1,7 @@
 ---
 name: git-pull-request
 description: 現ブランチの変更で PR を作成するとき、ユーザーが「PR 作って」と依頼したとき、または `/pull-request` として明示呼び出しされたときに起動する。保護ブランチ（main / master / develop / release/vX.Y.Z）では即中断する。
+model: haiku
 ---
 
 # Git Pull Request Skill

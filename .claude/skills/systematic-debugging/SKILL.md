@@ -1,6 +1,7 @@
 ---
 name: systematic-debugging
 description: テスト失敗 / 本番バグ / 想定外挙動 / パフォーマンス問題 / ビルド失敗 / integration 問題に直面したとき、修正前に体系的な根本原因調査を強制する。`/debug` として明示呼び出しされたときも起動する。
+model: opus
 ---
 
 # Systematic Debugging Skill

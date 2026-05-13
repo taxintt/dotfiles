@@ -1,6 +1,7 @@
 ---
 name: strategic-compact
 description: 任意タイミングで走る auto-compaction ではなく、論理的な区切りで手動 /compact を促すことで、タスクフェーズ間のコンテキストを保全する
+model: haiku
 ---
 
 # Strategic Compact Skill

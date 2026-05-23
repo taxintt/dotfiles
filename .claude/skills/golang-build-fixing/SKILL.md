@@ -1,6 +1,7 @@
 ---
 name: golang-build-fixing
 description: Go の `go build ./...` / `go vet` / `staticcheck` / `golangci-lint` 失敗時、依存が壊れたとき、pull 後にビルドが通らなくなったときに起動する。`go-build-resolver` agent を呼び出し、1 件ずつ最小修正する。`/go-build` として明示呼び出しされたときも起動する。
+model: sonnet
 ---
 
 # Go Build Fixing Skill

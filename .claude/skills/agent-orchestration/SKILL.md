@@ -1,6 +1,7 @@
 ---
 name: agent-orchestration
 description: 複雑タスクを複数 agent の連鎖で実行する。`/orchestrate <workflow-type> <task>` として明示呼び出しされたとき、または feature / bugfix / refactor / security のような multi-phase 作業を一括で進めたいときに起動する。
+model: opus
 ---
 
 # Agent Orchestration Skill

@@ -1,6 +1,7 @@
 ---
 name: design-interview
 description: システム設計を開始するとき、要件が曖昧なとき、またはユーザーが `/design-interview` として明示呼び出ししたときに起動する。設計書作成前に質問フェーズで不明点を解消する。規模（小 / 中 / 大）別の質問プロファイルに従う。
+model: sonnet
 ---
 
 # Design Interview Skill

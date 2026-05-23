@@ -1,6 +1,7 @@
 ---
 name: terraform-validation
 description: Terraform module 変更後に static checks / Conftest(OPA) ポリシー検証 / `terraform test` を実行してゲート判定する。プラグイン提供の terraform-test skill が「テストの書き方」を担当するのに対し、本 skill は「実行とゲート」を担当する。`*.tf`/`*.tftest.hcl` を編集した後、PR 前、`/tf-verify` 呼び出し時に起動する
+model: sonnet
 ---
 
 # Terraform Validation Harness

@@ -1,6 +1,7 @@
 ---
 name: golang-patterns
 description: Idiomatic Go patterns, best practices, and conventions for building robust, efficient, and maintainable Go applications. Includes Go-specific code review workflow. Use when writing, reviewing, or refactoring Go code, or when invoked as `/go-review`.
+model: sonnet
 ---
 
 # Go Development Patterns

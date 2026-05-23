@@ -1,6 +1,7 @@
 ---
 name: verification-loop
 description: PR / commit 作成前にビルド / 型チェック / lint / テスト / シークレット / デバッグ文 / git 状態を網羅的に検証する。ユーザーが「検証して」「PR 前チェックして」と依頼したとき、または `/verify` として呼ばれたときに起動する
+model: sonnet
 ---
 
 # Verification Loop Skill

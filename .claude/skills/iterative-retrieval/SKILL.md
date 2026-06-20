@@ -1,6 +1,6 @@
 ---
 name: iterative-retrieval
-description: コンテキスト取得を段階的に絞り込み、subagent のコンテキスト問題を解消するためのパターン
+description: Subagent に渡すコンテキストを段階的に絞り込む検索パターン。subagent が情報不足/過多で失敗したとき、広いコードベースから関連ファイルだけを特定して subagent に渡したいとき、または `iterative-retrieval` として明示呼び出しされたときに使う。単一ファイルの単純検索には使わない。
 model: opus
 ---
 

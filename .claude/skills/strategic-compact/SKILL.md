@@ -1,6 +1,6 @@
 ---
 name: strategic-compact
-description: 任意タイミングで走る auto-compaction ではなく、論理的な区切りで手動 /compact を促すことで、タスクフェーズ間のコンテキストを保全する
+description: 論理的な作業の区切りで手動 /compact を促し、フェーズ間のコンテキストを保全する。調査完了後・マイルストーン達成後・タスク切り替え前など、auto-compaction を待たずにコンテキストを最適化したいときに起動する。タスク途中の細かい区切りでは使わない。
 model: haiku
 ---
 

@@ -39,7 +39,8 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "dig@kuu-marketplace": true,
-    "terraform-code-generation@hashicorp": true
+    "terraform-code-generation@hashicorp": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -52,6 +53,12 @@
       "source": {
         "source": "github",
         "repo": "hashicorp/agent-skills"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     }
   },

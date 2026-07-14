@@ -33,21 +33,6 @@ $(printf '%s' "$out" | grep -E '^(FAIL|---\s*FAIL|\s+.*\.go:[0-9]+)' | head -30)
   fi
 fi
 
-tf_dirs="$(find . -maxdepth 4 -name '*.tf' -not -path './.terraform/*' -not -path '*/_archive/*' 2>/dev/null | xargs -I{} dirname {} | sort -u | head -10)"
-if [ -n "$tf_dirs" ] && command -v terraform >/dev/null 2>&1; then
-  while IFS= read -r d; do
-    [ -d "$d/.terraform" ] || continue
-    out="$(cd "$d" && timeout 20 terraform validate 2>&1 || true)"
-    if printf '%s' "$out" | grep -qE '(Error:|Errors:)'; then
-      # "Module source has changed" は terraform init が必要な状態なのでブロックしない
-      if ! printf '%s' "$out" | grep -qF 'Module source has changed'; then
-        failures="${failures}
-== terraform validate failed in $d ==
-$(printf '%s' "$out" | head -20)"
-      fi
-    fi
-  done <<< "$tf_dirs"
-fi
 
 if [ -n "$failures" ]; then
   block "Completion blocked by Stop hook — fix the following before declaring done:

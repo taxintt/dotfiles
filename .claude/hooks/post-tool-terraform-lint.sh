@@ -6,7 +6,8 @@ set -uo pipefail
 input="$(cat || true)"
 [ -z "$input" ] && exit 0
 
-file="$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_input.path // empty' 2>/dev/null || true)"
+JQ=$(command -v gojq 2>/dev/null || command -v jq)
+file="$(printf '%s' "$input" | $JQ -r '.tool_input.file_path // .tool_input.path // empty' 2>/dev/null || true)"
 case "$file" in
   *.tf|*.tfvars) ;;
   *)             exit 0 ;;
@@ -15,7 +16,7 @@ esac
 
 emit() {
   local msg="$1"
-  jq -Rn --arg msg "$msg" '{
+  $JQ -Rn --arg msg "$msg" '{
     hookSpecificOutput: {
       hookEventName: "PostToolUse",
       additionalContext: $msg

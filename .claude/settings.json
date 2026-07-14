@@ -1,4 +1,12 @@
 {
+  "cleanupPeriodDays": 3000,
+  "env": {
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "235000"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "includeCoAuthoredBy": false,
   "permissions": {
     "deny": [
@@ -21,47 +29,7 @@
       "Bash(mysql:*)"
     ]
   },
-  "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": true,
-    "allowUnsandboxedCommands": false,
-    "network": {
-      "allowedDomains": ["github.com", "api.github.com", "*.githubusercontent.com"],
-      "allowLocalBinding": true
-    },
-    "enableWeakerNetworkIsolation": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y ccusage statusline",
-    "padding": 0
-  },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "dig@kuu-marketplace": true,
-    "terraform-code-generation@hashicorp": true,
-    "codex@openai-codex": true
-  },
-  "extraKnownMarketplaces": {
-    "kuu-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "fumiya-kume/claude-code"
-      }
-    },
-    "hashicorp": {
-      "source": {
-        "source": "github",
-        "repo": "hashicorp/agent-skills"
-      }
-    },
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    }
-  },
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -124,5 +92,50 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccusage statusline",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "dig@kuu-marketplace": true,
+    "terraform-code-generation@hashicorp": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "kuu-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "fumiya-kume/claude-code"
+      }
+    },
+    "hashicorp": {
+      "source": {
+        "source": "github",
+        "repo": "hashicorp/agent-skills"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "*.githubusercontent.com"
+      ],
+      "allowLocalBinding": true
+    },
+    "enableWeakerNetworkIsolation": true
   }
 }

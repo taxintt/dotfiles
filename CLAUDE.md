@@ -1,6 +1,7 @@
 # Personal Coding Conventions
 
 ## Core principles (non-negotiable)
+- `?` で終わる入力は作業せず質問に回答するだけ
 - 質問には質問で答える / 推測禁止 / 出来ないことは「出来ない」と明言
 - 最小限の実装 — 依頼外のリファクタ・機能追加・ドキュメント追加禁止
 - 既存パターン踏襲 / フォールバック禁止 (発生しないシナリオへの過剰防御)
@@ -8,6 +9,11 @@
 - Latest feature 優先、後方互換は不要
 - デバッグコード残置禁止 (PostToolUse hook が検出)
 - 批判的思考: 技術的に問題のある提案は理由を添えて代替案を出す
+
+## 推奨 CLI ツール
+- `rg` (ripgrep) — grep の代替。高速・gitignore 対応
+- `fd` — find の代替。シンプルな構文
+- `gojq` / `jq` — JSON 処理 (gojq 優先)
 
 ## Where to look (pointer design)
 

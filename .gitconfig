@@ -90,10 +90,5 @@
 [log]
 	date = relative
 
-[commit]
-	gpgsign = true
-
-[user]
-	signingkey = 65243AC5A1EC917C
 [ghq]
-	root = /Users/taxin/src
+	root = $HOME/src

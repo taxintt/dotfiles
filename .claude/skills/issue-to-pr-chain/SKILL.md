@@ -25,7 +25,9 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
 2. **計画** — issue 種別で分岐:
    - バグ報告 → `systematic-debugging` skill（Phase 1-3 で原因特定後、Phase 4 から実装へ）
    - 機能・改善 → `implementation-planning` skill（承認ホワイトリストに一致するまで実装しない）
+   - 数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡す。受け入れレビュー（同 skill Phase 6）完了後、ステップ 6 のデリバリーから再合流する
 3. **実装** — `tdd-workflow` skill。言語特化があれば委譲: Go → `golang-testing`、`*.tf` 編集後 → `terraform-validation`
+   - ユーザーが Codex 委譲を指示したときは本ステップを `codex-delegation` skill に置換する（ステップ 4-5 は省略しない）
 4. **レビュー** — `code-review-routing` skill。CRITICAL が残っていたら修正してから次へ
 5. **検証** — `verification-loop` skill を `pre-pr` モードで実行
 6. **デリバリー** — `git-workflow-chain` skill（branch → commit → PR）。PR 本文に `Closes #<issue 番号>` を含める
@@ -51,11 +53,14 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
 | 「検証は CI がやるからローカルは省略」 | `pre-pr` はローカルゲート。CI 失敗後の往復コストのほうが高い |
 | 「レビューは PR 上で人間がやるから skip」 | `code-review-routing` は PR 前の自己レビュー。人間レビューの代替ではなく前提 |
 | 「バグの原因は自明だから調査不要」 | 自明に見える原因は `systematic-debugging` Phase 1 で数分で裏が取れる。取れないなら自明ではなかった |
+| 「Codex がテスト込みで実装したからレビュー・検証は済んでいる」 | Codex の編集は PostToolUse hook を通らない（`codex-delegation` の Iron Law）。委譲時こそステップ 4-5 が唯一のゲートになる |
+| 「goal mode に渡したので本チェーンは終了」 | 自走はデリバリーを含まない。受け入れレビュー後にステップ 6 で PR まで到達して初めて完了 |
 
 ## 関連
 
 - 計画: `implementation-planning` / `systematic-debugging`
 - 実装: `tdd-workflow`（Go: `golang-testing` / Terraform: `terraform-validation`）
+- Codex 委譲: `codex-delegation`（同期・小タスク）/ `codex-goal-handoff`（長時間自走）
 - レビューと検証: `code-review-routing` / `verification-loop`
 - デリバリー: `git-workflow-chain`
 - アイデア起点の同型チェーン: `idea-to-pr-chain`

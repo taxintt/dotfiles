@@ -24,7 +24,9 @@ model: opus
 1. **`grill-me` skill を起動** — アイデアを stress-test し、確定した理解 / 未確定の論点を要約する（この段階で成果物は書かない）
 2. **`design-interview` skill を起動** — 次のいずれかに該当するとき: 複数コンポーネント / データ永続化 / 外部連携 / 妥当なアーキテクチャが複数ある。いずれにも該当しない小規模なら skip 可（skip したことと理由を明示する）
 3. **`implementation-planning` skill を起動** — 承認ホワイトリストに一致するまで実装しない
+   - 数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡す。受け入れレビュー（同 skill Phase 6）完了後、ステップ 7 のデリバリーから再合流する
 4. **実装** — `tdd-workflow` skill。言語特化があれば委譲: Go → `golang-testing`、`*.tf` 編集後 → `terraform-validation`
+   - ユーザーが Codex 委譲を指示したときは本ステップを `codex-delegation` skill に置換する（ステップ 5-6 は省略しない）
 5. **レビュー** — `code-review-routing` skill。CRITICAL が残っていたら修正してから次へ
 6. **検証** — `verification-loop` skill を `pre-pr` モードで実行
 7. **デリバリー** — `git-workflow-chain` skill（branch → commit → PR）
@@ -50,9 +52,12 @@ model: opus
 | 「質問はいいと言われたので推測で設計する」 | 絞れるのは質問の数であって、切り分けの省略ではない。`grill-me` は少数の急所質問に絞って実施する |
 | 「プロトタイプだから TDD もレビューも不要」 | 品質基準の緩和は各 skill 内の判断。チェーンが先回りしてステップごと飛ばさない |
 | 「grill-me の流れでそのまま実装したほうが速い」 | `grill-me` は成果物を書かない skill。承認ゲートを通らない実装は Iron Law 違反 |
+| 「Codex がテスト込みで実装したからレビュー・検証は済んでいる」 | Codex の編集は PostToolUse hook を通らない（`codex-delegation` の Iron Law）。委譲時こそステップ 5-6 が唯一のゲートになる |
+| 「goal mode に渡したので本チェーンは終了」 | 自走はデリバリーを含まない。受け入れレビュー後にステップ 7 で PR まで到達して初めて完了 |
 
 ## 関連
 
 - 上流: `grill-me` / `design-interview` / `implementation-planning`
 - 実装以降: `tdd-workflow` / `code-review-routing` / `verification-loop` / `git-workflow-chain`
+- Codex 委譲: `codex-delegation`（同期・小タスク）/ `codex-goal-handoff`（長時間自走）
 - issue 起点の同型チェーン: `issue-to-pr-chain`

@@ -84,3 +84,4 @@ model: sonnet
 
 - 設計質問: `design-interview` skill
 - 実装計画: `implementation-planning` skill
+- 連鎖: `doc-workflow-chain` skill（計画 → 執筆 一気通貫）

@@ -121,3 +121,4 @@ model: sonnet
 
 - 計画書（設計書ではない）: `doc-planning` skill
 - 実装計画: `implementation-planning` skill
+- 連鎖: `idea-to-pr-chain` skill（アイデア → PR 一気通貫）

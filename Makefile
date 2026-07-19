@@ -28,6 +28,9 @@ link: ## make symlinks
 rule-sync: ## generate AGENTS.md (Codex) from CLAUDE.md
 	npx -y rulesync convert --from claudecode --to codexcli --features rules
 
+agmsg-install: ## install agmsg (cross-agent messaging)
+	npx -y agmsg
+
 gitleaks-scan: ## scan gitleaks for all ghq repos
 	@echo "Starting gitleaks scan for all ghq repositories..."
 	@ghq list | while read repo; do \

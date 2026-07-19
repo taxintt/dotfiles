@@ -29,6 +29,7 @@ skill / agent カタログ:
 
 ドメイン別ポインタ:
 - Codex への実装委譲 (Claude = orchestrator / Codex = implementer) → `codex-delegation` skill
+- Codex Goal mode での自走実装 + agmsg advisor 常駐 → `codex-goal-handoff` skill
 - Terraform 検証 → `terraform-validation` skill
 - Go 規約・ビルド・テスト → `golang-patterns` / `golang-testing` / `golang-build-fixing` skill
 - セキュリティ応答 → `security-reviewer` agent + `.claude/rules/security.md`

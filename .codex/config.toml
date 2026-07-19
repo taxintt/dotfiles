@@ -8,5 +8,14 @@ preferred_auth_method = "chatgpt"
 # (Claude Code 側の permissions.deny と同等の制約をサンドボックス側でも表現する)
 sandbox_mode = "workspace-write"
 
+# Goal mode (`/goal`) — ChatGPT 認証モードでのみ動作する
+[features]
+goals = true
+
 [sandbox_workspace_write]
 network_access = false
+# agmsg (エージェント間メッセージング) の共有 SQLite は workspace 外にあるため明示許可する
+writable_roots = [
+  "~/.agents/skills/agmsg/db",
+  "~/.agents/skills/agmsg/teams"
+]

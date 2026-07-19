@@ -42,3 +42,4 @@ model: haiku
 ## 関連
 
 - `git-branching` / `git-commit` / `git-pull-request`
+- 上流連鎖: `issue-to-pr-chain` / `idea-to-pr-chain` skill（本 skill をデリバリー段として利用）

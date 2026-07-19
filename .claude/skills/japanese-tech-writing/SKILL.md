@@ -199,3 +199,4 @@ LLM が大量生成する、中身のない型に誘惑されない。書き上�
 
 - `doc-planning` — 執筆前の計画（読者分析・アウトライン）。本 skill は文章本体を扱う。
 - `code-review-routing` — コードのレビュー。本 skill は日本語 prose のレビュー。
+- `doc-workflow-chain` — 計画 → 執筆の一気通貫連鎖。

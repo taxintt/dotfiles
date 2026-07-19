@@ -96,3 +96,4 @@ model: sonnet
 ## 関連
 
 - Agent: `~/.claude/agents/planner.md`
+- 連鎖: `issue-to-pr-chain` / `idea-to-pr-chain` skill（計画 → PR 一気通貫）

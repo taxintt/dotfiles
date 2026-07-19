@@ -25,8 +25,8 @@ brew-list-independent-packages: ## list independent packages
 link: ## make symlinks
 	./scripts/link.sh
 
-rule-sync: ## sync rules
-	npx rulesync generate -c rulesync.jsonc
+rule-sync: ## generate AGENTS.md (Codex) from CLAUDE.md
+	npx -y rulesync convert --from claudecode --to codexcli --features rules
 
 gitleaks-scan: ## scan gitleaks for all ghq repos
 	@echo "Starting gitleaks scan for all ghq repositories..."

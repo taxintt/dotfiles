@@ -25,7 +25,7 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
 2. **計画** — issue 種別で分岐:
    - バグ報告 → `systematic-debugging` skill（Phase 1-3 で原因特定後、Phase 4 から実装へ）
    - 機能・改善 → `implementation-planning` skill（承認ホワイトリストに一致するまで実装しない）
-   - 数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡す。受け入れレビュー（同 skill Phase 6）完了後、ステップ 6 のデリバリーから再合流する
+   - 機能・改善経路で数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡し、受け入れレビュー（同 skill Phase 6）完了後にステップ 6 から再合流する。バグ経路では `systematic-debugging` に承認ゲートがないため、原因特定後に `implementation-planning` で計画化・承認を経てから渡す
 3. **実装** — `tdd-workflow` skill。言語特化があれば委譲: Go → `golang-testing`、`*.tf` 編集後 → `terraform-validation`
    - ユーザーが Codex 委譲を指示したときは本ステップを `codex-delegation` skill に置換する（ステップ 4-5 は省略しない）
 4. **レビュー** — `code-review-routing` skill。CRITICAL が残っていたら修正してから次へ
@@ -40,7 +40,7 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
 ## Iron Law
 
 - **計画の承認前に実装しない**（`implementation-planning` の Iron Law を継承）
-- **ステップの省略禁止**。「issue が小さい」は各ステップを速く通過する理由にはなるが、飛ばす理由にはならない
+- **ステップの省略禁止**。「issue が小さい」は各ステップを速く通過する理由にはなるが、飛ばす理由にはならない。Codex への置換・handoff（ステップ 2-3 の分岐）は省略ではなく、同等の検証ゲート（受け入れレビューまたはステップ 4-5）を通すことが条件
 - 途中失敗・検証 FAIL 時は続行しない
 - 本 skill は composition のみ。計画・テスト・検証の基準を重複して持たない
 

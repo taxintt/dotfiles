@@ -40,7 +40,7 @@ model: opus
 
 - **`grill-me` の確定 / 未確定の切り分けなしに設計・実装へ進まない**。未確定論点を推測で埋めるのは推測禁止原則の違反
 - **計画の承認前に実装しない**（`implementation-planning` の Iron Law を継承）
-- ステップ 2 以外の省略禁止。省略できるのは条件を明示した `design-interview` のみ
+- ステップ 2 以外の省略禁止。省略できるのは条件を明示した `design-interview` のみ。Codex への置換・handoff（ステップ 3-4 の分岐）は省略ではなく、同等の検証ゲート（受け入れレビューまたはステップ 5-6）を通すことが条件
 - 途中失敗・検証 FAIL 時は続行しない
 - 本 skill は composition のみ
 

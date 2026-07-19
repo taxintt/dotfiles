@@ -9,6 +9,9 @@
   },
   "includeCoAuthoredBy": false,
   "permissions": {
+    "allow": [
+      "Bash(codex exec:*)"
+    ],
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm:*)",

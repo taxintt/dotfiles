@@ -83,17 +83,6 @@
           }
         ]
       }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/pre-compact-preserve.sh",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
   "statusLine": {

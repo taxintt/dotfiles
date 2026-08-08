@@ -1,0 +1,4 @@
+# `codex --profile sol` で overlay される設定 (dotfiles 管理)
+# /goal による長時間自走など、深い判断が必要なタスク向け
+model = "gpt-5.6-sol"
+model_reasoning_effort = "xhigh"

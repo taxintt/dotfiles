@@ -1,0 +1,21 @@
+# Codex CLI 設定 (dotfiles 管理 / scripts/link.sh で ~/.codex/ にリンク)
+# 認証は ChatGPT ログイン (`codex login`)。auth.json は生成物なので git 管理しない。
+preferred_auth_method = "chatgpt"
+
+# model は未指定 — Codex CLI の既定モデルを使う
+
+# workspace 外への書き込みとネットワークアクセスを遮断する
+# (Claude Code 側の permissions.deny と同等の制約をサンドボックス側でも表現する)
+sandbox_mode = "workspace-write"
+
+# Goal mode (`/goal`) — ChatGPT 認証モードでのみ動作する
+[features]
+goals = true
+
+[sandbox_workspace_write]
+network_access = false
+# agmsg (エージェント間メッセージング) の共有 SQLite は workspace 外にあるため明示許可する
+writable_roots = [
+  "~/.agents/skills/agmsg/db",
+  "~/.agents/skills/agmsg/teams"
+]

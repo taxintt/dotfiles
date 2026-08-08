@@ -28,3 +28,6 @@ Temporary Items
 
 .gitconfig.local
 .claude/settings.local.json
+.codex/work.config.toml
+
+**/.claude/.cc-writes/

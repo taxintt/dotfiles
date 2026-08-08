@@ -44,3 +44,4 @@ design tree を branch ごとに歩き、決定間の依存を 1 つずつ解決
 ## 関連
 - 設計書化: `design-interview` / 実装計画: `implementation-planning`
 - 既存 plan の深掘り強化: `dig`（plugin）
+- 連鎖: `idea-to-pr-chain` skill（アイデア → PR 一気通貫）

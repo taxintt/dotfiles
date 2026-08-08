@@ -9,6 +9,9 @@
   },
   "includeCoAuthoredBy": false,
   "permissions": {
+    "allow": [
+      "Bash(codex exec:*)"
+    ],
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm:*)",
@@ -80,17 +83,6 @@
           }
         ]
       }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/pre-compact-preserve.sh",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
   "statusLine": {
@@ -102,7 +94,8 @@
     "gopls-lsp@claude-plugins-official": true,
     "dig@kuu-marketplace": true,
     "terraform-code-generation@hashicorp": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "compact-plus@compact-plus-local": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -121,6 +114,12 @@
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "compact-plus-local": {
+      "source": {
+        "source": "github",
+        "repo": "u-ichi/compact-plus"
       }
     }
   },

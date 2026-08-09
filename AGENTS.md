@@ -35,12 +35,6 @@ skill / agent カタログ:
 - セキュリティ応答 → `security-reviewer` agent + `.claude/rules/security.md`
 - リサーチ手法 → `.claude/rules/research.md` + `iterative-retrieval` / `obsidian-context` skill
 - ADR → 各リポジトリの `docs/adr/`
-- アーカイブ済みルール (1 週間試用後削除予定) → `.claude/rules/_archive/`
-
-## Active expanded rules
-@.claude/rules/security.md
-@.claude/rules/research.md
-@.claude/rules/patterns.md
 
 # Personal Patterns
 

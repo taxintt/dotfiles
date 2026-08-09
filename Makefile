@@ -31,9 +31,24 @@ rule-sync: ## generate AGENTS.md (Codex) from CLAUDE.md
 agmsg-install: ## install agmsg (cross-agent messaging)
 	npx -y agmsg
 
-gitleaks-scan: ## scan gitleaks for all ghq repos
-	@echo "Starting gitleaks scan for all ghq repositories..."
-	@ghq list | while read repo; do \
+gitleaks-scan: ## scan gitleaks for all ghq repos (redacted reports, written outside the scanned repos)
+	@report_dir="$${TMPDIR:-/tmp}/gitleaks-reports"; \
+	mkdir -p "$$report_dir"; \
+	echo "Scanning all ghq repositories. Reports: $$report_dir"; \
+	leaked=""; failed=""; \
+	for repo in $$(ghq list); do \
 		echo "Scanning $$repo ..."; \
-		gitleaks detect --source "$$(ghq root)/$$repo" --report-path "$$(ghq root)/$$repo/gitleaks-report.json" || true; \
-	done
+		gitleaks git --redact --no-banner \
+			--report-path "$$report_dir/$$(echo "$$repo" | tr / _).json" \
+			"$$(ghq root)/$$repo"; \
+		rc=$$?; \
+		if [ $$rc -eq 1 ]; then leaked="$$leaked $$repo"; \
+		elif [ $$rc -ne 0 ]; then failed="$$failed $$repo"; fi; \
+	done; \
+	for repo in $$failed; do echo "SCAN ERROR: $$repo"; done; \
+	if [ -n "$$leaked" ]; then \
+		echo "Leaks detected in:"; \
+		for repo in $$leaked; do echo "  $$repo"; done; \
+		exit 1; \
+	fi; \
+	echo "No leaks found."

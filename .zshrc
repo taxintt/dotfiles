@@ -150,7 +150,6 @@ alias tfp='terraform plan'
 alias tfa='terraform apply'
 alias tfs='terraform show'
 alias tfd='terraform destroy'
-alias gtf='export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token) | terraform'
 
 ## kubernetes
 alias k='kubectl'

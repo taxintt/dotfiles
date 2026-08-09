@@ -95,7 +95,8 @@
     "dig@kuu-marketplace": true,
     "terraform-code-generation@hashicorp": true,
     "codex@openai-codex": true,
-    "compact-plus@compact-plus-local": true
+    "compact-plus@compact-plus-local": true,
+    "postgres-best-practices@supabase-agent-skills": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -120,6 +121,12 @@
       "source": {
         "source": "github",
         "repo": "u-ichi/compact-plus"
+      }
+    },
+    "supabase-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "supabase/agent-skills"
       }
     }
   },

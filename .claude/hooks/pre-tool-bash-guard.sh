@@ -38,6 +38,21 @@ check_target() {
   esac
 }
 
+# Drop heredoc bodies first. Their content is data, not commands, so scanning it
+# for redirections misreads prose (a PR body quoting `> .env`, say) as a write.
+# The line carrying the `<<` is kept, so `cat > .env <<EOF` is still caught.
+cmd="$(printf '%s\n' "$cmd" | awk '
+{
+  if (d != "") { if ($0 == d || $1 == d) d = ""; next }
+  if (match($0, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*[\047"]?/)) {
+    t = substr($0, RSTART, RLENGTH)
+    sub(/^<<-?[ \t]*/, "", t)
+    gsub(/[\047"]/, "", t)
+    d = t
+  }
+  print
+}')"
+
 segments="$(printf '%s' "$cmd" | sed -E 's/(\|\|?|&&|;)/\n/g')"
 
 while IFS= read -r seg; do

@@ -1,7 +1,8 @@
 {
   "cleanupPeriodDays": 3000,
   "env": {
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "235000"
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "235000",
+    "CLAUDE_CODE_THRIFTY_SONIC": "0"
   },
   "attribution": {
     "commit": "",

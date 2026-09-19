@@ -11,10 +11,9 @@ plus agent configuration for Claude Code and Codex CLI.
 | `.claude/skills/` | Claude Code skills (34) |
 | `.claude/agents/` | Subagent definitions (8) |
 | `.claude/hooks/` | PreToolUse / PostToolUse / Stop verification hooks (5) |
-| `.claude/rules/` | Rules loaded from `CLAUDE.md` (3) |
 | `.claude/settings.json` | Permissions, sandbox, and plugin configuration |
 | `.codex/` | Codex CLI configuration |
-| `CLAUDE.md` / `AGENTS.md` | Coding conventions. `AGENTS.md` is generated from `CLAUDE.md` via `make rule-sync` |
+| `AGENTS.md` | Coding conventions shared by Claude Code and Codex CLI. Linked to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | `BrewFile` | Homebrew package list |
 
 ## Setup

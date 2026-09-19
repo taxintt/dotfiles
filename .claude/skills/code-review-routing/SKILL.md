@@ -61,7 +61,7 @@ model: sonnet
 - 既存パターンとの不整合
 - a11y（ブラウザ UI 変更時のみ）
 - mutation パターン（JS/TS）
-- Emoji 使用（CLAUDE.md 原則: ユーザーが明示しない限り禁止）
+- Emoji 使用（AGENTS.md 原則: ユーザーが明示しない限り禁止）
 
 ## 出力フォーマット
 

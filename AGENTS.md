@@ -32,8 +32,8 @@ skill / agent カタログ:
 - Codex Goal mode での自走実装 + agmsg advisor 常駐 → `codex-goal-handoff` skill
 - Terraform 検証 → `terraform-validation` skill
 - Go 規約・ビルド・テスト → `golang-patterns` / `golang-testing` / `golang-build-fixing` skill
-- セキュリティ応答 → `security-reviewer` agent + `.claude/rules/security.md`
-- リサーチ手法 → `.claude/rules/research.md` + `iterative-retrieval` / `obsidian-context` skill
+- セキュリティ応答 → `security-reviewer` agent + 本ファイル「Security Guidelines」
+- リサーチ手法 → 本ファイル「Research Mode」 + `iterative-retrieval` / `obsidian-context` skill
 - ADR → 各リポジトリの `docs/adr/`
 
 # Personal Patterns

@@ -91,4 +91,4 @@ agmsg でメッセージを受信したら:
 
 - 同期・小タスク委譲: `codex-delegation` skill
 - プラン策定: `design-interview` / `grill-me` / `implementation-planning` skill
-- Codex 側の規約: `AGENTS.md` (`make rule-sync` で生成)
+- Codex 側の規約: `AGENTS.md` (Claude Code と共通の単一ソース)

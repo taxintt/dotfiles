@@ -55,11 +55,11 @@ make_symlink .claude/settings.json
 # make symbolic links under directory
 make_symlink_under_dir .codex
 make_symlink_under_dir .claude/agents
-make_symlink_under_dir .claude/rules
 make_symlink_under_dir .claude/skills
 make_symlink_under_dir .claude/hooks
 
-# CLAUDE.md / AGENTS.md as global instructions
-# (AGENTS.md is generated from CLAUDE.md by `make rule-sync`)
-make_symlink CLAUDE.md .claude/CLAUDE.md
+# AGENTS.md as the single global instruction file for both agents.
+# Claude Code reads AGENTS.md natively only at project scope, so the
+# user-scope ~/.claude/CLAUDE.md stays as a symlink to it.
+make_symlink AGENTS.md .claude/CLAUDE.md
 make_symlink AGENTS.md .codex/AGENTS.md

@@ -16,6 +16,22 @@ plus agent configuration for Claude Code and Codex CLI.
 | `AGENTS.md` | Coding conventions shared by Claude Code and Codex CLI. Linked to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | `BrewFile` | Homebrew package list |
 
+## Skill routing
+
+The pre-implementation skills are split by responsibility. Skill selection is
+description text matching, so each one names what it does *not* own.
+
+| Skill | Owns | Defers to |
+|---|---|---|
+| `grill-me` | Stress-testing a raw idea, plan, or requirement. Writes no deliverable | `design-interview` for choosing an architecture and writing the design doc |
+| `design-interview` | Comparing 2-3 design options, then writing the design doc | `grill-me` for firming up the requirement itself |
+| `pbi-breakdown` | Splitting a PBI into SBIs through four gates (user value / definition of done / acceptance criteria / out of scope) | `grill-me` for ideation, `design-interview` for technical design, `implementation-planning` for planning |
+| `idea-to-pr-chain` | Composing `grill-me` → `design-interview` → `implementation-planning` → implement → review → verify → `git-workflow-chain` | The individual skills above for each step's substance |
+
+`pbi-breakdown` is a separate entry point rather than a step of
+`idea-to-pr-chain`. It ends by recommending `issue-to-pr-chain` (given the first
+SBI issue in dependency order) or `implementation-planning`.
+
 ## Setup
 
 ### 1. Install packages

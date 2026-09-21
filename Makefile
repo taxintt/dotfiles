@@ -25,9 +25,6 @@ brew-list-independent-packages: ## list independent packages
 link: ## make symlinks
 	./scripts/link.sh
 
-rule-sync: ## generate AGENTS.md (Codex) from CLAUDE.md
-	npx -y rulesync convert --from claudecode --to codexcli --features rules
-
 agmsg-install: ## install agmsg (cross-agent messaging)
 	npx -y agmsg
 

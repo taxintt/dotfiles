@@ -96,7 +96,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 ```
 
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
-- **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。現行ドキュメントが挙げる場所は `.github/ISSUE_TEMPLATE.md` だが、リポジトリ直下や `docs/` に `ISSUE_TEMPLATE.md` を置く古いレイアウトも残っている。GitHub が自動適用するかに関わらず、そこにあるならそれがそのリポジトリの様式なので従う。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を 3 箇所順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
+- **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。現行ドキュメントが挙げる場所は `.github/ISSUE_TEMPLATE.md` だが、リポジトリ直下や `docs/` に `ISSUE_TEMPLATE.md` を置く古いレイアウトも残っている。GitHub が自動適用するかに関わらず、そこにあるならそれがそのリポジトリの様式なので従う。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を 3 箇所順に試し、全部 404 なら「出力フォーマット」の構造を issue 本文に使う。ただし**親には PBI 側のセクション、各 SBI には `目的 / 受け入れ条件 / 依存` だけ**を入れる。全文をそのまま流すと、SBI ごとに「SBI 一覧」「実施順序」が入れ子で並ぶ
 - `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。**値が空文字（`labels: ''`）ならそのキーは payload に書かない** — `[""]` を送ると空のラベル名として弾かれる。GitHub 既定のテンプレートは空文字で出荷される。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
 - `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキー）。`labels` / `assignees` の配列化・カンマ分割・空文字の扱いは `*.md` と同じ規則に従う（リストで書かれることが多いが、スカラー文字列も来る）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
   - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
@@ -105,7 +105,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 **b. 作成前に承認を得る**
 
-組み上げた親 issue と各 SBI のタイトル・本文を提示し、**明示承認を得てから作成する**（既存 issue が入力なら親は再利用するので、提示するのは SBI と、親に紐づける旨）。issue は作成後に取り消せない（削除には admin 権限が必要）ため、ユーザーが一度も見ていない本文で実リポジトリに N 件立てない。
+組み上げた親 issue と各 SBI のタイトル・本文を提示し、**明示承認を得てから作成する**（既存 issue が入力なら親は再利用するので、提示するのは SBI と、親に紐づける旨）。提示時点では依存先の issue 番号がまだ無いので `依存: SBI 2` のまま見せ、**「作成時に実 issue 番号へ置き換える」と添える**（置換は承認済み本文への無断変更ではない、と明示するため）。issue は作成後に取り消せない（削除には admin 権限が必要）ため、ユーザーが一度も見ていない本文で実リポジトリに N 件立てない。
 
 **c. 親 → 子の順に作成して親子付けする**
 
@@ -148,11 +148,13 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 - **自由文入力**: `実施順序` 以外は c の親 payload の `body` に含めて作成済み。`実施順序` は実 issue 番号が要るので**ここで PATCH して入れる**（親を作る時点では SBI の番号がまだ無い）
 - **既存 issue 入力**: 親の本文はユーザーが書いたもの。**黙って上書きしない**。「本文に追記」か「コメントで残す」かを 1 問聞き、選ばれた方で全セクションを書く
 
+**この 2 つの payload は `{"body": "..."}` だけ**。c の `{title, body, labels, assignees}` を流用してはいけない。`PATCH /issues/<番号>` は渡したキーで**丸ごと置き換える**ので、`title` / `labels` を含めるとチームが付けたタイトルとラベルがテンプレート由来の値に化ける（`/comments` はそもそも `body` しか受け付けない）。
+
 ```bash
 # コメントで残す場合
 gh api repos/<owner>/<repo>/issues/<親の number>/comments --input <payload.json>
 
-# 本文に追記する場合（既存本文を取得し、末尾に足した全文を送る）
+# 本文に追記する場合。PATCH の body は全文置換なので、既存本文を取って末尾に足した「全文」を送る
 gh api repos/<owner>/<repo>/issues/<親の number> --jq .body
 gh api repos/<owner>/<repo>/issues/<親の number> -X PATCH --input <payload.json>
 ```
@@ -191,7 +193,8 @@ gh api repos/<owner>/<repo>/issues/<親の number> -X PATCH --input <payload.jso
 - SBI に人日・ポイント・S/M/L など見積もりらしき記述がある
 - 「前提」のリストが「完了の定義」の代わりに置かれている
 - ユーザーに聞かずに出力先を決めて出力している
-- ユーザーが本文を見ていない状態で GitHub issue を作成している
+- ユーザーが本文を見ていない状態で GitHub issue を作成している（b で予告した `依存:` の issue 番号置換はこれに当たらない）
+- 既存 issue への `PATCH` に `title` / `labels` / `assignees` を含めている（全文置換なのでチームの付けた値が消える）
 - 対象リポジトリが cwd 任せになっている（`gh issue view` の `--repo` 省略、`gh api` のパスに `repos/<owner>/<repo>` を書いていない、ローカルの `.github/` を読んでいる）
 
 ## 関連

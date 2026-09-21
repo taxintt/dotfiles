@@ -96,8 +96,8 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 ```
 
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
-- **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。GitHub が見る場所は `.github/ISSUE_TEMPLATE.md` / リポジトリ直下の `ISSUE_TEMPLATE.md` / `docs/ISSUE_TEMPLATE.md` の 3 つで、`.github/` だけ見て 404 だと独自フォーマットで立ててしまう。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
-- `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
+- **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。現行ドキュメントが挙げる場所は `.github/ISSUE_TEMPLATE.md` だが、リポジトリ直下や `docs/` に `ISSUE_TEMPLATE.md` を置く古いレイアウトも残っている。GitHub が自動適用するかに関わらず、そこにあるならそれがそのリポジトリの様式なので従う。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を 3 箇所順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
+- `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。**値が空文字（`labels: ''`）ならそのキーは payload に書かない** — `[""]` を送ると空のラベル名として弾かれる。GitHub 既定のテンプレートは空文字で出荷される。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
 - `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキーで、`labels` はここでは YAML のリスト）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
   - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
   - `validations.required: true` の項目は空にしない
@@ -109,7 +109,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 **c. 親 → 子の順に作成して親子付けする**
 
-**入力が既存 issue（番号 / URL）だった場合、その issue が親。新しく親を立ててはならない**。同内容の issue が 2 つ並び、SBI が全て重複側に紐づき、どちらも削除できない。親の number は入力そのもので、database id は `gh api repos/<owner>/<repo>/issues/<番号> --jq '{number, id}'` で取る。以下の「親 PBI issue」の作成は**自由文入力のときだけ**行う。
+**入力が既存 issue（番号 / URL）だった場合、その issue が親。新しく親を立ててはならない**。同内容の issue が 2 つ並び、SBI が全て重複側に紐づき、どちらも削除できない。親の number は入力そのものなので、追加の取得は要らない（親は下記の親子付けでパスの number としてしか使わず、database id を使うのは子だけ）。以下の「親 PBI issue」の作成は**自由文入力のときだけ**行う。
 
 GitHub MCP があれば `issue_write` (method: create)。自由文入力なら先に親を作り（既存 issue 入力ならその番号をそのまま使い）、各 SBI の作成時に `parent_issue_number` へ親の issue 番号を渡すと作成と親子付けが 1 操作で済む。`labels` / `assignees` も同じ呼び出しで渡せる（`parent_issue_number` と排他なのは `issue_fields` だけ）。
 
@@ -124,8 +124,8 @@ payload の形（親・SBI とも同じ）。`labels` / `assignees` は a で読
 ```
 
 ```bash
-# 親 PBI issue（自由文入力のときだけ。number と database id が返る）
-gh api repos/<owner>/<repo>/issues --input <親の payload.json> --jq '{number, id}'
+# 親 PBI issue（自由文入力のときだけ。親は number しか使わない）
+gh api repos/<owner>/<repo>/issues --input <親の payload.json> --jq .number
 
 # 各 SBI。labels / assignees を付け忘れない。値は SBI 用テンプレートのもので、
 # 親のラベルをコピーするのではない（a でテンプレートが分かれていた場合）

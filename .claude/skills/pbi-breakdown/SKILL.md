@@ -20,7 +20,8 @@ model: opus
 
 - PBI の内容（自由文）、または GitHub issue の番号 / URL
 - issue が渡されたら GitHub MCP (`issue_read`) または `gh issue view <番号> --repo <owner>/<repo> --comments` で本文・コメントを自分で取得してから対話を始める（コードや issue で調べられることをユーザーに聞くのは対話規律違反のため）
-- **対象リポジトリは入力の issue URL から決める。cwd のリポジトリとは限らない**。URL が渡されず番号だけ・自由文だけのときは対象リポジトリを 1 問で確認する。以降 `gh` を使うときは対象リポジトリを必ず明示する（`gh issue view` などは `--repo <owner>/<repo>`、`gh api` はパスの `repos/<owner>/<repo>`）。省略すると cwd のリポジトリを読み書きしてしまう
+- **対象リポジトリは入力の issue URL から決める。cwd のリポジトリとは限らない**。`gh` を使うときは対象リポジトリを必ず明示する（`gh issue view` などは `--repo <owner>/<repo>`、`gh api` はパスの `repos/<owner>/<repo>`）。省略すると cwd のリポジトリを読み書きしてしまう
+- URL がなく番号・自由文だけで渡された場合、リポジトリを聞くのは **GitHub issue 化を選んだときだけ**（「出力先の選択」3 で聞く）。チャット表示・ファイル保存で終わるなら GitHub を一度も触らないので、この質問は消費者のいない往復になる
 
 ## 対話規律（grill-me を継承）
 
@@ -32,7 +33,7 @@ model: opus
 
 ## 質問ゲート
 
-以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 8 回まで（4 ゲート × 初回 1 問 + 曖昧な回答への押し返し 1 回分）。8 回で解けない論点は推測で埋めず Open Questions に送る。**対象リポジトリの確認（前述）と出力段階の質問（後述）はこの上限の外側**で行う。
+以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 8 回まで（4 ゲート × 初回 1 問 + 曖昧な回答への押し返し 1 回分）。8 回で解けない論点は推測で埋めず Open Questions に送る。**ただしゲート B は例外**で、上限に達しても未確定なら SBI を出さず、そこまでの確定内容と未確定点を報告して停止する（Iron Law が予算より優先する）。**出力段階の質問（後述。対象リポジトリの確認を含む）はこの上限の外側**で行う。
 
 1. **A. ユーザー価値** — 誰のどんな課題が解決されるか。価値が言えない PBI は分割しても価値のないタスクの山になる
 2. **B. 完了の定義** — この PBI が「終わった」と言える観測可能な状態。ここが全 SBI の導出元になる最重要ゲート
@@ -74,11 +75,13 @@ model: opus
 
 ## 出力先の選択
 
-SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・テンプレート選択・作成承認）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
+SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・対象リポジトリ・テンプレート選択・作成承認）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
 
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
 3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する。以下 a → b → c の順に行う
+
+対象リポジトリがまだ確定していなければ（入力が issue URL でなかった場合）、ここで 1 問確認してから a に進む。
 
 **a. テンプレートを対象リポジトリから読む**
 
@@ -91,8 +94,10 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
 - ディレクトリが 404 なら旧形式の単一テンプレートを `gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE.md -H 'Accept: application/vnd.github.raw'` で見る。どちらも 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
-- `*.md`: セクション構造に従って記入する。front matter の `labels` / `assignees` は c で作成時に引き渡す。`<!-- -->` コメントは出力に含めない
-- `*.yml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める
+- `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` は c の payload へ渡すが、この形式では**カンマ区切りの文字列**（`labels: bug, triage`）なので、分割して配列にする
+- `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキーで、`labels` はここでは YAML のリスト）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
+  - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
+  - `validations.required: true` の項目は空にしない
 - テンプレートが複数あるなら、どれを使うか確認する。PBI と SBI で別テンプレートが用意されていることがある
 
 **b. 作成前に承認を得る**
@@ -105,9 +110,9 @@ GitHub MCP があれば `issue_write` (method: create)。先に親を作り、�
 
 MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず番号も database id も取れないため使わない。
 
-タイトルと本文はモデルが生成した markdown で `'` を含みうる（`user's`、`don't`）。シェルの引用に載せると引用が壊れて本文が切れるので、**issue 1 件につき payload を JSON ファイルに書き、`--input` で渡す**:
+タイトルと本文はモデルが生成した markdown で `'` を含みうる（`user's`、`don't`）。シェルの引用に載せると引用が壊れて本文が切れるので、**issue 1 件につき payload を JSON ファイルに書き、`--input` で渡す**。ファイルは `mktemp -d` で作った一時ディレクトリに置き、作成後に削除する（リポジトリ直下に置くと次の `git add -A` で巻き込まれる）。
 
-payload の形（親・SBI とも同じ）。`labels` / `assignees` はテンプレート front matter の値で、該当する値が無いキーは書かない（プレースホルダのまま送らない）:
+payload の形（親・SBI とも同じ）。`labels` / `assignees` は a で読んだテンプレートの値で、該当する値が無いキーは書かない（プレースホルダのまま送らない）:
 
 ```json
 {"title": "...", "body": "...", "labels": ["..."], "assignees": ["..."]}
@@ -130,7 +135,8 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 
 出力後、次の skill を 1 つ推奨して終了する（実行はしない）:
 
-- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の issue URL** を渡す。番号だけ渡すと cwd のリポジトリの同番号 issue に解決され、無関係なリポジトリで実装と PR が進む。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
+- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の issue URL** を渡す。番号だけ渡すと cwd のリポジトリの同番号 issue に解決される。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
+  - 対象リポジトリが cwd と違うなら、**先に cwd を対象リポジトリへ移すようユーザーに伝える**。URL を渡して切り替わるのは issue の読み取りだけで、同 skill の実装・PR 作成（`tdd-workflow` / `git-workflow-chain`）は cwd のリポジトリで動く
 - それ以外 → `implementation-planning`（最初の SBI の実装計画へ）
 
 ## Iron Law

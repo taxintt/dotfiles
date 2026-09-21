@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: 生のアイデア / plan / 要件の妥当性を実装前に stress-test したいとき、「このアイデア詰めて」「詰めて」「grill して」「壁打ちして」のように妥当性の検証を依頼されたとき、または `/grill-me` として明示呼び出しされたときに起動する。どのアーキテクチャ・技術構成で行くかという設計方式の決定と設計書化は `design-interview` の担当。
+description: 生のアイデア / plan / 要件の妥当性を実装前に stress-test したいとき、「このアイデア詰めて」「詰めて」「grill して」「壁打ちして」のように妥当性の検証を依頼されたとき、または `/grill-me` として明示呼び出しされたときに起動する。設計方式の決定と設計書化は `design-interview` の担当。
 model: opus
 ---
 

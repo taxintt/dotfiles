@@ -8,7 +8,7 @@ plus agent configuration for Claude Code and Codex CLI.
 | Path | Description |
 |---|---|
 | `.zshrc` `.gitconfig` `.tmux.conf` `.config/` | Shell, git, and terminal configuration |
-| `.claude/skills/` | Claude Code skills (34) |
+| `.claude/skills/` | Claude Code skills (35) |
 | `.claude/agents/` | Subagent definitions (8) |
 | `.claude/hooks/` | PreToolUse / PostToolUse / Stop verification hooks (5) |
 | `.claude/rules/` | Rules loaded from `CLAUDE.md` (3) |

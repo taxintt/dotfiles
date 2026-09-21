@@ -76,6 +76,11 @@ SBI 導出後、**1 問で**出力先を聞く（推奨回答付き）:
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
 3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する
+   - **作成前に `.github/ISSUE_TEMPLATE/`（または旧形式の `.github/ISSUE_TEMPLATE.md`）を読む**。リポジトリが求めるフォーマットを無視した issue はレビューで差し戻されるため
+     - `*.md`: セクション構造に従って記入し、front matter の `labels` / `assignees` は `gh issue create --label` 等に反映する。`<!-- -->` コメントは出力に含めない
+     - `*.yml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める
+     - テンプレートが複数あるなら、どれを使うか **1 問で**確認する（推奨回答付き）。PBI と SBI で別テンプレートが用意されていることがある
+     - テンプレートが無ければ「出力フォーマット」の構造をそのまま issue 本文にする
    - GitHub MCP があれば `issue_write` (method: create) に `parent_issue_number` を渡す。作成と親子付けが 1 操作で済む
    - MCP がない環境でも `gh` で同じことができる。`gh issue create` で SBI を作り、`gh api repos/{owner}/{repo}/issues/<親番号>/sub_issues -F sub_issue_id=<子の database id>` で親子付けする。`sub_issue_id` は issue 番号ではなく database id なので `gh api repos/{owner}/{repo}/issues/<子番号> --jq .id` で取る（`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない）
 

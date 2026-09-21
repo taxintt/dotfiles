@@ -32,7 +32,7 @@ model: opus
 
 ## 質問ゲート
 
-以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 5 回まで。5 回で解けない論点は推測で埋めず Open Questions に送る。**対象リポジトリの確認（前述）と出力段階の質問（後述）はこの上限の外側**で行う。
+以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 8 回まで（4 ゲート × 初回 1 問 + 曖昧な回答への押し返し 1 回分）。8 回で解けない論点は推測で埋めず Open Questions に送る。**対象リポジトリの確認（前述）と出力段階の質問（後述）はこの上限の外側**で行う。
 
 1. **A. ユーザー価値** — 誰のどんな課題が解決されるか。価値が言えない PBI は分割しても価値のないタスクの山になる
 2. **B. 完了の定義** — この PBI が「終わった」と言える観測可能な状態。ここが全 SBI の導出元になる最重要ゲート
@@ -74,7 +74,7 @@ model: opus
 
 ## 出力先の選択
 
-SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・テンプレート選択・作成承認）はゲートの 5 ラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
+SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・テンプレート選択・作成承認）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
 
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
@@ -103,16 +103,22 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 GitHub MCP があれば `issue_write` (method: create)。先に親を作り、各 SBI の作成時に `parent_issue_number` へ親の issue 番号を渡すと作成と親子付けが 1 操作で済む。`labels` / `assignees` も同じ呼び出しで渡せる（`parent_issue_number` と排他なのは `issue_fields` だけ）。
 
-MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず番号も database id も取れないため使わない:
+MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず番号も database id も取れないため使わない。
+
+タイトルと本文はモデルが生成した markdown で `'` を含みうる（`user's`、`don't`）。シェルの引用に載せると引用が壊れて本文が切れるので、**issue 1 件につき payload を JSON ファイルに書き、`--input` で渡す**:
+
+payload の形（親・SBI とも同じ）。`labels` / `assignees` はテンプレート front matter の値で、該当する値が無いキーは書かない（プレースホルダのまま送らない）:
+
+```json
+{"title": "...", "body": "...", "labels": ["..."], "assignees": ["..."]}
+```
 
 ```bash
 # 親 PBI issue（number と database id が返る）
-# labels / assignees はテンプレート front matter の値。無ければその行ごと省く
-gh api repos/<owner>/<repo>/issues -f title='<PBI タイトル>' -f body='<PBI 本文>' \
-  -f 'labels[]=<ラベル>' -f 'assignees[]=<ユーザー>' --jq '{number, id}'
+gh api repos/<owner>/<repo>/issues --input <親の payload.json> --jq '{number, id}'
 
-# 各 SBI
-gh api repos/<owner>/<repo>/issues -f title='<SBI タイトル>' -f body='<SBI 本文>' --jq '{number, id}'
+# 各 SBI。labels / assignees は親と同様に payload へ含める（親だけに付けて子に付け忘れない）
+gh api repos/<owner>/<repo>/issues --input <SBI の payload.json> --jq '{number, id}'
 
 # 親子付け。sub_issue_id は issue 番号ではなく database id
 gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<子の id>
@@ -124,7 +130,7 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 
 出力後、次の skill を 1 つ推奨して終了する（実行はしない）:
 
-- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の sub-issue 番号**を渡す。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
+- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の issue URL** を渡す。番号だけ渡すと cwd のリポジトリの同番号 issue に解決され、無関係なリポジトリで実装と PR が進む。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
 - それ以外 → `implementation-planning`（最初の SBI の実装計画へ）
 
 ## Iron Law

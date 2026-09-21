@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: 生のアイデア / plan / 要件の妥当性を実装前に stress-test したいとき、「このアイデア詰めて」「grill して」「壁打ちして」のように妥当性の検証を依頼されたとき、または `/grill-me` として明示呼び出しされたときに起動する。どのアーキテクチャ・技術構成で行くかなど設計判断を詰める相談は `design-interview` が担当するため起動しない。
+description: 生のアイデア / plan / 要件の妥当性を実装前に stress-test したいとき、「このアイデア詰めて」「詰めて」「grill して」「壁打ちして」のように妥当性の検証を依頼されたとき、または `/grill-me` として明示呼び出しされたときに起動する。どのアーキテクチャ・技術構成で行くかという設計方式の決定と設計書化は扱わず、`design-interview` へ handoff する。
 model: opus
 ---
 
@@ -11,9 +11,11 @@ model: opus
 理解が揃ったら次の skill へ handoff する。
 
 ## 発火タイミング
-- plan / 設計 / 生アイデアを作る前に stress-test したい
-- 要件を「詰めたい」
-- ユーザーが「詰めて」「grill して」と言った、または `/grill-me` と呼んだとき
+- 生アイデア / plan / 要件の妥当性を実装前に stress-test したい
+- ユーザーが「詰めて」「grill して」「壁打ちして」と言った、または `/grill-me` と呼んだとき
+
+どのアーキテクチャ・技術構成で行くかという **設計方式の決定と設計書化は本 skill では扱わない**。
+妥当性が固まった時点で `design-interview` へ handoff する。
 
 ## 進め方
 design tree を branch ごとに歩き、決定間の依存を 1 つずつ解決しながら、

@@ -74,6 +74,8 @@ model: opus
 ## Open Questions
 ```
 
+`前提・制約` だけはゲート A〜D の産物ではないので、**ユーザーの回答か PBI 本文に明示された制約だけ**を書く。該当する記載がなければ「なし」と書く。ここをモデルの前提で埋めるのが最も起きやすい Iron Law 違反。
+
 ## 出力先の選択
 
 SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・対象リポジトリ・テンプレート選択・作成承認）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
@@ -94,8 +96,8 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 ```
 
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
-- ディレクトリが 404 なら旧形式の単一テンプレートを `gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE.md -H 'Accept: application/vnd.github.raw'` で見る。どちらも 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
-- `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` は c の payload へ渡すが、**YAML として解釈した結果を配列にする**。この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る
+- ディレクトリが 404 なら旧形式の単一テンプレートを探す。GitHub が見る場所は `.github/ISSUE_TEMPLATE.md` / リポジトリ直下の `ISSUE_TEMPLATE.md` / `docs/ISSUE_TEMPLATE.md` の 3 つで、`.github/` だけ見て 404 だと独自フォーマットで立ててしまう。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
+- `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
 - `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキーで、`labels` はここでは YAML のリスト）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
   - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
   - `validations.required: true` の項目は空にしない
@@ -109,7 +111,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 GitHub MCP があれば `issue_write` (method: create)。先に親を作り、各 SBI の作成時に `parent_issue_number` へ親の issue 番号を渡すと作成と親子付けが 1 操作で済む。`labels` / `assignees` も同じ呼び出しで渡せる（`parent_issue_number` と排他なのは `issue_fields` だけ）。
 
-MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず番号も database id も取れないため使わない。
+MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず、親子付けに要る **database id が取れない**ため使わない（番号は URL 末尾から取れるが、id は別途 `gh api` を叩くことになり二度手間）。
 
 タイトルと本文はモデルが生成した markdown で `'` を含みうる（`user's`、`don't`）。シェルの引用に載せると引用が壊れて本文が切れるので、**issue 1 件につき payload を JSON ファイルに書き、`--input` で渡す**。ファイルは `mktemp -d` で作った一時ディレクトリに置く（リポジトリ直下に置くと次の `git add -A` で巻き込まれる）。
 
@@ -131,6 +133,8 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 ```
 
 既存 issue を後から子にする場合の database id は `gh api repos/<owner>/<repo>/issues/<番号> --jq .id` で取る。`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない。
+
+**作成済みの number / id は 1 件ごとに手元に残す**。途中で失敗したら、成功済みを作り直さず**残りの SBI と未実行の親子付けだけを再開する**。step c をまるごと再実行すると親 PBI issue が二重に立ち、issue は削除できない（b 参照）。
 
 ## Handoff
 
@@ -160,7 +164,7 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 
 ### Red Flags — こうなっていたら停止して見直す
 
-- 1 メッセージに質問が 2 問以上並んでいる（番号・カテゴリ・★印での整理を含む）
+- 1 メッセージに質問が 2 問以上並んでいる（番号・カテゴリ・★印での整理を含む）。1 問に対する選択肢の列挙（「出力先の選択」の 1 / 2 / 3 など）はこれに当たらない
 - SBI に人日・ポイント・S/M/L など見積もりらしき記述がある
 - 「前提」のリストが「完了の定義」の代わりに置かれている
 - ユーザーに聞かずに出力先を決めて出力している

@@ -19,7 +19,7 @@ model: opus
 ## 引数
 
 - PBI の内容（自由文）、または GitHub issue の番号 / URL
-- issue が渡されたら GitHub MCP (`issue_read`) で本文・コメントを自分で取得してから対話を始める（コードや issue で調べられることをユーザーに聞くのは対話規律違反のため）
+- issue が渡されたら GitHub MCP (`issue_read`) または `gh issue view <番号> --comments` で本文・コメントを自分で取得してから対話を始める（コードや issue で調べられることをユーザーに聞くのは対話規律違反のため）
 
 ## 対話規律（grill-me を継承）
 
@@ -31,7 +31,7 @@ model: opus
 
 ## 質問ゲート
 
-以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。質問ラウンドは合計 5 回まで。5 回で解けない論点は推測で埋めず Open Questions に送る。
+以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 5 回まで。5 回で解けない論点は推測で埋めず Open Questions に送る。出力先の確認（後述）はこの上限の外側で必ず行う。
 
 1. **A. ユーザー価値** — 誰のどんな課題が解決されるか。価値が言えない PBI は分割しても価値のないタスクの山になる
 2. **B. 完了の定義** — この PBI が「終わった」と言える観測可能な状態。ここが全 SBI の導出元になる最重要ゲート
@@ -75,13 +75,15 @@ SBI 導出後、**1 問で**出力先を聞く（推奨回答付き）:
 
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
-3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成。`issue_write` (method: create) に `parent_issue_number` を渡すと作成と親子付けが 1 操作で済む。GitHub MCP が使えない環境では sub-issue 化は出来ないと明言し、親 issue 本文へのタスクリスト方式に切り替えるかを 1 問で確認する
+3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する
+   - GitHub MCP があれば `issue_write` (method: create) に `parent_issue_number` を渡す。作成と親子付けが 1 操作で済む
+   - MCP がない環境でも `gh` で同じことができる。`gh issue create` で SBI を作り、`gh api repos/{owner}/{repo}/issues/<親番号>/sub_issues -F sub_issue_id=<子の database id>` で親子付けする。`sub_issue_id` は issue 番号ではなく database id なので `gh api repos/{owner}/{repo}/issues/<子番号> --jq .id` で取る（`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない）
 
 ## Handoff
 
 出力後、次の skill を 1 つ推奨して終了する（実行はしない）:
 
-- issue 化した場合 → `issue-to-pr-chain`（issue 起点で実装まで進める）
+- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の sub-issue 番号**を渡す。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
 - それ以外 → `implementation-planning`（最初の SBI の実装計画へ）
 
 ## Iron Law

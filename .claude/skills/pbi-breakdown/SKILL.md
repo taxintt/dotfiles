@@ -78,11 +78,11 @@ model: opus
 
 ## 出力先の選択
 
-SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・対象リポジトリ・テンプレート選択・作成承認）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
+SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・対象リポジトリ・テンプレート選択・作成承認・親 issue への書き戻し方）はゲート質問のラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
 
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
-3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する。以下 a → b → c の順に行う
+3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する。以下 a → b → c → d の順に行う
 
 対象リポジトリがまだ確定していなければ（自由文入力で「引数」の段階では聞いていない場合）、ここで 1 問確認してから a に進む。
 
@@ -98,7 +98,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
 - **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。現行ドキュメントが挙げる場所は `.github/ISSUE_TEMPLATE.md` だが、リポジトリ直下や `docs/` に `ISSUE_TEMPLATE.md` を置く古いレイアウトも残っている。GitHub が自動適用するかに関わらず、そこにあるならそれがそのリポジトリの様式なので従う。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を 3 箇所順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
 - `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。**値が空文字（`labels: ''`）ならそのキーは payload に書かない** — `[""]` を送ると空のラベル名として弾かれる。GitHub 既定のテンプレートは空文字で出荷される。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
-- `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキーで、`labels` はここでは YAML のリスト）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
+- `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキー）。`labels` / `assignees` の配列化・カンマ分割・空文字の扱いは `*.md` と同じ規則に従う（リストで書かれることが多いが、スカラー文字列も来る）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
   - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
   - `validations.required: true` の項目は空にしない
 - テンプレートが複数あるなら、どれを使うか確認する。PBI と SBI で別テンプレートが用意されていることがある
@@ -137,7 +137,27 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 
 既存 issue を後から子にする場合の database id は `gh api repos/<owner>/<repo>/issues/<番号> --jq .id` で取る。`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない。
 
+**SBI は `実施順序` のとおりに作る**。依存先が必ず先に作成済みになるので、各 SBI の `依存:` に**実 issue 番号（`#123`）を書ける**。`SBI 2` のような通し番号のまま issue に出すと GitHub 上で解決できず、着手する人が何待ちか分からない（循環依存は「SBI 導出基準」で禁じているので、この順序は必ず作れる）。
+
 **作成済みの number / id は 1 件ごとに手元に残す**。途中で失敗したら、成功済みを作り直さず**残りの SBI と未実行の親子付けだけを再開する**。step c をまるごと再実行すると親 PBI issue が二重に立ち、issue は削除できない（b 参照）。
+
+**d. PBI 本文を親 issue に残す**
+
+`完了の定義` / `受け入れ条件` / `スコープ外` / `前提・制約` / `実施順序` / `Open Questions` は、ゲート対話の成果そのもの。**チャットにしか無い状態で終わらせない**（セッションが切れると、チームには根拠のない SBI の山だけが残る）。
+
+- **自由文入力**: `実施順序` 以外は c の親 payload の `body` に含めて作成済み。`実施順序` は実 issue 番号が要るので**ここで PATCH して入れる**（親を作る時点では SBI の番号がまだ無い）
+- **既存 issue 入力**: 親の本文はユーザーが書いたもの。**黙って上書きしない**。「本文に追記」か「コメントで残す」かを 1 問聞き、選ばれた方で全セクションを書く
+
+```bash
+# コメントで残す場合
+gh api repos/<owner>/<repo>/issues/<親の number>/comments --input <payload.json>
+
+# 本文に追記する場合（既存本文を取得し、末尾に足した全文を送る）
+gh api repos/<owner>/<repo>/issues/<親の number> --jq .body
+gh api repos/<owner>/<repo>/issues/<親の number> -X PATCH --input <payload.json>
+```
+
+どちらの経路でも `実施順序` は**実 issue 番号**で書く（`SBI 1 → SBI 2` ではなく `#123 → #124`）。
 
 ## Handoff
 

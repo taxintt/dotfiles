@@ -1,6 +1,6 @@
 ---
 name: pbi-breakdown
-description: スクラムの PBI (Product Backlog Item) を SBI (Sprint Backlog Item) に分割するとき、スプリントプランニングやリファインメントでバックログアイテムをタスク分解したいとき、「この PBI をタスクに割って」「スプリントのタスクに分割したい」のような依頼を受けたとき、または `/pbi-breakdown` として明示呼び出しされたときに起動する。対話で PBI の実現したい状態を確定させてから SBI を導出する。
+description: スクラムの PBI (Product Backlog Item) を SBI (Sprint Backlog Item) に分割するとき、スプリントプランニングやリファインメントでバックログアイテムをタスク分解したいとき、「この PBI をタスクに割って」「スプリントのタスクに分割したい」のような依頼を受けたとき、または `/pbi-breakdown` として明示呼び出しされたときに起動する。
 model: opus
 ---
 
@@ -19,7 +19,8 @@ model: opus
 ## 引数
 
 - PBI の内容（自由文）、または GitHub issue の番号 / URL
-- issue が渡されたら GitHub MCP (`issue_read`) または `gh issue view <番号> --comments` で本文・コメントを自分で取得してから対話を始める（コードや issue で調べられることをユーザーに聞くのは対話規律違反のため）
+- issue が渡されたら GitHub MCP (`issue_read`) または `gh issue view <番号> --repo <owner>/<repo> --comments` で本文・コメントを自分で取得してから対話を始める（コードや issue で調べられることをユーザーに聞くのは対話規律違反のため）
+- **対象リポジトリは入力の issue URL から決める。cwd のリポジトリとは限らない**。URL が渡されず番号だけ・自由文だけのときは対象リポジトリを 1 問で確認する。以降 `gh` を使うときは常に `--repo <owner>/<repo>` を明示する（省略すると cwd のリポジトリに issue を作ってしまうため）
 
 ## 対話規律（grill-me を継承）
 
@@ -31,14 +32,14 @@ model: opus
 
 ## 質問ゲート
 
-以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 5 回まで。5 回で解けない論点は推測で埋めず Open Questions に送る。出力先の確認（後述）はこの上限の外側で必ず行う。
+以下 4 ゲートを順に通す。PBI 本文や調査で既に確定しているゲートは、確定内容を 1 行で示して通過してよい（確認済みの事実を聞き直すのは往復の無駄のため）。ゲート質問のラウンドは合計 5 回まで。5 回で解けない論点は推測で埋めず Open Questions に送る。出力段階の質問（後述）はこの上限の外側で行う。
 
 1. **A. ユーザー価値** — 誰のどんな課題が解決されるか。価値が言えない PBI は分割しても価値のないタスクの山になる
 2. **B. 完了の定義** — この PBI が「終わった」と言える観測可能な状態。ここが全 SBI の導出元になる最重要ゲート
 3. **C. 受け入れ条件** — 完了の定義を検証可能な条件のリストに落とす
 4. **D. スコープ外** — 今回やらないことの明示。スコープ外が空の分割はスプリント中に膨張する
 
-時間圧（「質問はいいから」「時間がない」）を受けたら、**ゲート B の急所 1 問だけに絞って**聞く。減らせるのは質問の数であって、ゲートの省略ではない。
+時間圧（「質問はいいから」「時間がない」）を受けたら、**ゲート B の急所 1 問だけに絞って**聞く。減らせるのは質問の数であって、ゲートの省略ではない。**聞かなかったゲート A / C / D は推測で埋めず Open Questions に送り**、出力フォーマットの該当セクションには「未確定 — Open Questions 参照」と書く。空欄を仮説で埋めた時点で Iron Law 違反になる。
 
 ## SBI 導出基準
 
@@ -71,18 +72,19 @@ model: opus
 
 ## 出力先の選択
 
-SBI 導出後、**1 問で**出力先を聞く（推奨回答付き）:
+SBI 導出後、出力先を聞く（推奨回答付き）。**この段階の質問（出力先・保存先パス・テンプレート選択・作成承認）はゲートの 5 ラウンド上限の外側**だが、対話規律どおり **1 問ずつ**聞く:
 
 1. チャットに markdown 表示（そのままコピーして使う場合）
 2. markdown ファイルとして保存（保存先パスも確認）
 3. GitHub issue 化 — PBI を親 issue、各 SBI を sub-issue として作成する
    - **作成前に `.github/ISSUE_TEMPLATE/`（または旧形式の `.github/ISSUE_TEMPLATE.md`）を読む**。リポジトリが求めるフォーマットを無視した issue はレビューで差し戻されるため
-     - `*.md`: セクション構造に従って記入し、front matter の `labels` / `assignees` は `gh issue create --label` 等に反映する。`<!-- -->` コメントは出力に含めない
+     - `*.md`: セクション構造に従って記入し、front matter の `labels` / `assignees` は作成時に引き渡す（`gh` なら `--label` / `--assignee`、MCP なら `issue_write` の `labels` / `assignees`）。`<!-- -->` コメントは出力に含めない
      - `*.yml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める
-     - テンプレートが複数あるなら、どれを使うか **1 問で**確認する（推奨回答付き）。PBI と SBI で別テンプレートが用意されていることがある
+     - テンプレートが複数あるなら、どれを使うか確認する。PBI と SBI で別テンプレートが用意されていることがある
      - テンプレートが無ければ「出力フォーマット」の構造をそのまま issue 本文にする
+   - **組み上げた親 issue と各 SBI のタイトル・本文を提示し、明示承認を得てから作成する**。issue は作成後に取り消せない（削除には admin 権限が必要）ため、ユーザーが一度も見ていない本文で実リポジトリに N 件立てない
    - GitHub MCP があれば `issue_write` (method: create) に `parent_issue_number` を渡す。作成と親子付けが 1 操作で済む
-   - MCP がない環境でも `gh` で同じことができる。`gh issue create` で SBI を作り、`gh api repos/{owner}/{repo}/issues/<親番号>/sub_issues -F sub_issue_id=<子の database id>` で親子付けする。`sub_issue_id` は issue 番号ではなく database id なので `gh api repos/{owner}/{repo}/issues/<子番号> --jq .id` で取る（`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない）
+   - MCP がない環境でも `gh` で同じことができる。`gh issue create --repo <owner>/<repo>` で SBI を作り、`gh api repos/<owner>/<repo>/issues/<親番号>/sub_issues -F sub_issue_id=<子の database id>` で親子付けする。`sub_issue_id` は issue 番号ではなく database id なので `gh api repos/<owner>/<repo>/issues/<子番号> --jq .id` で取る（`gh issue view --json id` が返すのは GraphQL node ID で、この API には使えない）
 
 ## Handoff
 
@@ -115,6 +117,8 @@ SBI 導出後、**1 問で**出力先を聞く（推奨回答付き）:
 - SBI に人日・ポイント・S/M/L など見積もりらしき記述がある
 - 「前提」のリストが「完了の定義」の代わりに置かれている
 - ユーザーに聞かずに出力先を決めて出力している
+- ユーザーが本文を見ていない状態で GitHub issue を作成している
+- `gh` に `--repo` を付けず、対象リポジトリが cwd 任せになっている
 
 ## 関連
 

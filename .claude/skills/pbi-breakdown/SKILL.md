@@ -96,7 +96,7 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 ```
 
 - 一覧の `config.yml` は選択画面の設定であってテンプレート本体ではない。候補から除く
-- ディレクトリが 404 なら旧形式の単一テンプレートを探す。GitHub が見る場所は `.github/ISSUE_TEMPLATE.md` / リポジトリ直下の `ISSUE_TEMPLATE.md` / `docs/ISSUE_TEMPLATE.md` の 3 つで、`.github/` だけ見て 404 だと独自フォーマットで立ててしまう。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
+- **一覧が取れない（404、あるいは `.github/ISSUE_TEMPLATE` が拡張子なしのファイルで jq がエラーになる）か、`config.yml` を除くと候補が空**なら、旧形式の単一テンプレートを探す。GitHub が見る場所は `.github/ISSUE_TEMPLATE.md` / リポジトリ直下の `ISSUE_TEMPLATE.md` / `docs/ISSUE_TEMPLATE.md` の 3 つで、`.github/` だけ見て 404 だと独自フォーマットで立ててしまう。`gh api repos/<owner>/<repo>/contents/<パス> -H 'Accept: application/vnd.github.raw'` を順に試し、全部 404 なら「出力フォーマット」の構造をそのまま issue 本文にする
 - `*.md`: **先頭の YAML front matter（`---` で挟まれた部分）は本文から取り除く**。残ったセクション構造に従って記入し、`<!-- -->` コメントも出力に含めない。front matter の `labels` / `assignees` / `title` は c の payload へ渡す。`labels` / `assignees` は **YAML として解釈した結果を配列にする**（この形式で一般的な `labels: bug, triage` はカンマ区切りの 1 文字列なので分割が要る）。`title` は forms と同じく既定タイトルなので、`[PBI] ` のような接頭辞形式ならタイトルの先頭に付ける
 - `*.yml` / `*.yaml` (issue forms): `body[]` の `attributes.label` を見出しにして順に埋める。加えて**トップレベルの `labels` / `assignees` / `title`** も取り込む（front matter ではなくトップレベルのキーで、`labels` はここでは YAML のリスト）。`title` は既定タイトルなので、`[Bug]: ` のような接頭辞形式ならタイトルの先頭に付ける
   - `dropdown` / `checkboxes` の項目には宣言された `options` の値しか入れない。自由文を書くとフォームの体裁から外れる
@@ -105,11 +105,13 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<名前> -H 'Accept:
 
 **b. 作成前に承認を得る**
 
-組み上げた親 issue と各 SBI のタイトル・本文を提示し、**明示承認を得てから作成する**。issue は作成後に取り消せない（削除には admin 権限が必要）ため、ユーザーが一度も見ていない本文で実リポジトリに N 件立てない。
+組み上げた親 issue と各 SBI のタイトル・本文を提示し、**明示承認を得てから作成する**（既存 issue が入力なら親は再利用するので、提示するのは SBI と、親に紐づける旨）。issue は作成後に取り消せない（削除には admin 権限が必要）ため、ユーザーが一度も見ていない本文で実リポジトリに N 件立てない。
 
 **c. 親 → 子の順に作成して親子付けする**
 
-GitHub MCP があれば `issue_write` (method: create)。先に親を作り、各 SBI の作成時に `parent_issue_number` へ親の issue 番号を渡すと作成と親子付けが 1 操作で済む。`labels` / `assignees` も同じ呼び出しで渡せる（`parent_issue_number` と排他なのは `issue_fields` だけ）。
+**入力が既存 issue（番号 / URL）だった場合、その issue が親。新しく親を立ててはならない**。同内容の issue が 2 つ並び、SBI が全て重複側に紐づき、どちらも削除できない。親の number は入力そのもので、database id は `gh api repos/<owner>/<repo>/issues/<番号> --jq '{number, id}'` で取る。以下の「親 PBI issue」の作成は**自由文入力のときだけ**行う。
+
+GitHub MCP があれば `issue_write` (method: create)。自由文入力なら先に親を作り（既存 issue 入力ならその番号をそのまま使い）、各 SBI の作成時に `parent_issue_number` へ親の issue 番号を渡すと作成と親子付けが 1 操作で済む。`labels` / `assignees` も同じ呼び出しで渡せる（`parent_issue_number` と排他なのは `issue_fields` だけ）。
 
 MCP がない環境は `gh api` で行う。`gh issue create` は URL しか返さず、親子付けに要る **database id が取れない**ため使わない（番号は URL 末尾から取れるが、id は別途 `gh api` を叩くことになり二度手間）。
 
@@ -122,10 +124,11 @@ payload の形（親・SBI とも同じ）。`labels` / `assignees` は a で読
 ```
 
 ```bash
-# 親 PBI issue（number と database id が返る）
+# 親 PBI issue（自由文入力のときだけ。number と database id が返る）
 gh api repos/<owner>/<repo>/issues --input <親の payload.json> --jq '{number, id}'
 
-# 各 SBI。labels / assignees は親と同様に payload へ含める（親だけに付けて子に付け忘れない）
+# 各 SBI。labels / assignees を付け忘れない。値は SBI 用テンプレートのもので、
+# 親のラベルをコピーするのではない（a でテンプレートが分かれていた場合）
 gh api repos/<owner>/<repo>/issues --input <SBI の payload.json> --jq '{number, id}'
 
 # 親子付け。sub_issue_id は issue 番号ではなく database id
@@ -140,9 +143,9 @@ gh api repos/<owner>/<repo>/issues/<親の number>/sub_issues -F sub_issue_id=<�
 
 出力後、次の skill を 1 つ推奨して終了する（実行はしない）:
 
-- issue 化した場合 → `issue-to-pr-chain`（**最初の SBI の issue URL** を渡す。番号だけ渡すと cwd のリポジトリの同番号 issue に解決される。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
+- issue 化した場合 → `issue-to-pr-chain`（**`実施順序` の先頭の SBI の issue URL** を渡す。一覧の並びは着手順とは限らず、依存を残したまま実装が走る。番号だけ渡すと cwd のリポジトリの同番号 issue に解決される。同 skill は issue 1 件を PR 1 本に通すため、親 PBI issue を渡すと分割が 1 PR に潰れる）
   - 対象リポジトリが cwd と違うなら、**先に cwd を対象リポジトリへ移すようユーザーに伝える**。URL を渡して切り替わるのは issue の読み取りだけで、同 skill の実装・PR 作成（`tdd-workflow` / `git-workflow-chain`）は cwd のリポジトリで動く
-- それ以外 → `implementation-planning`（最初の SBI の実装計画へ）
+- それ以外 → `implementation-planning`（`実施順序` の先頭の SBI の実装計画へ）
 
 ## Iron Law
 

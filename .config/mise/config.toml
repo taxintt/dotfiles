@@ -7,6 +7,7 @@ actionlint = "latest"
 ecspresso = "latest"
 github-cli = "latest"
 terraform = "latest"
+tflint    = "latest"
 
 # [Node.js]
 node = "lts"

@@ -97,7 +97,8 @@
     "terraform-code-generation@hashicorp": true,
     "codex@openai-codex": true,
     "compact-plus@compact-plus-local": true,
-    "postgres-best-practices@supabase-agent-skills": true
+    "postgres-best-practices@supabase-agent-skills": true,
+    "clickhouse-best-practices@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {

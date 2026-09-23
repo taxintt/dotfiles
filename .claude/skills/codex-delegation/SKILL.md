@@ -72,5 +72,4 @@ Codex による編集は Claude 側からは Bash 実行にしか見えず、`Po
 - 長時間の自走実装 (Goal mode + agmsg advisor): `codex-goal-handoff` skill
 - 計画: `implementation-planning` skill
 - レビュー振り分け: `code-review-routing` skill
-- agent 連鎖に組み込む場合: `agent-orchestration` skill (実装フェーズを本 skill に置換できる)
 - Codex 側の規約: `AGENTS.md` (Claude Code と共通の単一ソース)

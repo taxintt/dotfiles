@@ -6,8 +6,6 @@ model: sonnet
 
 [共通本文](shared/instructions.md) を読み、手順に従う。本文中の参考資料は `shared/` を基準に解決する。
 
-## Claude Codeでの連携
-
 ## 関連
 
 - 設計質問: `design-interview` skill

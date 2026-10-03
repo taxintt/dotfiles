@@ -5,7 +5,3 @@ model: sonnet
 ---
 
 [共通本文](shared/instructions.md) を読み、手順に従う。本文中の参考資料は `shared/` を基準に解決する。
-
-## 関連
-
-- 検証: `verification-loop` skill（削除後の全体検証）

@@ -58,19 +58,28 @@ npm run test -- --coverage
 
 ### Phase 5: Security & Debug Statement Scan
 ```bash
-# Secrets: 候補の値を伏せ、ファイル名・行番号を表示
-rg --hidden -g '!.git' -n -o --replace '[REDACTED]' '\bsk-[A-Za-z0-9_-]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\b(?i:[A-Za-z0-9_]*(?:api_key|apiKey))\b\s*[:=]\s*[\x22\x27][^\x22\x27\r\n]{8,}[\x22\x27]' -g '*.ts' -g '*.js' .
+# pre-commit: インデックス全体を一時ディレクトリへ展開する。
+# 各コマンドの終了コードを確認し、失敗したらスキャンせずPhase 5をFAILにする。
+scan_dir=$(mktemp -d)
+git checkout-index --all --prefix="$scan_dir/"
+# このmodeの以下のrgは、末尾の . を "$scan_dir" に置き換える。
+# full / pre-prは作業ツリーの . を対象とする。
+
+# Secrets: 拡張子・ignore設定によらずテキストを検査し、値を伏せて表示
+rg --hidden --no-ignore -g '!.git' -n -o --replace '[REDACTED]' '\bsk-[A-Za-z0-9_-]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\b(?i:[A-Za-z0-9_]*(?:api_key|apiKey))\b[\x22\x27]?\s*[:=]\s*[\x22\x27]?[^\s\x22\x27#,;}]{8,}' .
 
 # Debug statements（言語別）
-rg --hidden -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
-rg --hidden -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
-rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
+rg --hidden --no-ignore -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
+rg --hidden --no-ignore -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
+rg --hidden --no-ignore -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
 
 # 秘匿ファイル (.env / credentials.json / id_rsa) のstaging有無を一覧から確認
 git diff --cached --name-only
 ```
+pre-commitでは各コマンドの終了コードと候補確認の結果を保持してから、一時展開先を削除する（`rm -rf -- "$scan_dir"`）。削除の終了コードでスキャン結果を置き換えない。
+
 `rg` の終了コードは 0 = 検出、1 = 検出なし、2以上 = 走査失敗。検出なしは正常だが、走査失敗やgitコマンドの失敗はPhase 5をFAILとする。出力を切り詰めず全件確認し、secretの値はレポートに載せない。
-**PASS/FAIL**: 候補のファイル・行番号を確認し、実際のsecretと誤検知を区別する。未解決の候補、確認されたsecret、または秘匿ファイルのstagingがあればFAIL。すべて誤検知と確認でき、秘匿ファイルstaged = 0ならPASS。debug 文は warnings 扱いで Issues to Fix へ（test ファイルは除外可）。ダミー値・変数名などの誤検知は理由をReportに記載して除外できる。候補確認時も値を出力せず、ファイル名・行番号・判定理由だけを報告する。
+**PASS/FAIL**: 候補のファイル・行番号を確認し、実際のsecretと誤検知を区別する。未解決の候補、確認されたsecret、または秘匿ファイルのstagingがあればFAIL。すべて誤検知と確認でき、秘匿ファイルstaged = 0ならPASS。debug 文は warnings 扱いで Issues to Fix へ（test ファイルは除外可）。ダミー値・変数名などの誤検知は理由をReportに記載して除外できる。pre-commitの候補確認も作業ツリーではなく一時展開先の内容を使い、パスはリポジトリ相対にして報告する。候補確認時も値を出力せず、ファイル名・行番号・判定理由だけを報告する。
 
 ### Phase 6: Diff Review
 ```bash
@@ -102,7 +111,7 @@ skill のコマンドは TS / Python 前提。他 stack では同等に置換す
 | **未設定の検証** | build設定なしならN/A | 型チェッカー未設定・対象なしならN/A | lint設定なしならN/A | テスト設定なしならN/A |
 | **Python** | `python -m build` or n/a | 設定済みの `pyright .` / `mypy .`。未設定ならN/A | `ruff check .` | `pytest --cov` |
 
-Security scan の `rg` 拡張子もリポジトリに存在する言語に合わせて置換（Go: `*.go`, Rust: `*.rs`, Python: `*.py`, shell: `*.sh` 等）。存在するリポジトリ直下を対象にし、固定のsrc/を前提にしない。該当言語のファイルが無ければその言語のdebug scanは適用外。security scanとstaging確認は実行する。
+secret scanは拡張子で制限しない。.env・JSON・YAML・TOML・dotfileも含め、引用符のない設定値も検査する。debug scanだけリポジトリに存在する言語の拡張子を指定する。pre-commitはインデックスの一時展開先、full / pre-prは存在するリポジトリ直下を対象とし、固定のsrc/を前提にしない。該当言語のファイルが無ければその言語のdebug scanは適用外。security scanとstaging確認は実行する。
 
 ## Overall 判定アルゴリズム
 

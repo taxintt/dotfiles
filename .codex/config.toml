@@ -19,3 +19,6 @@ writable_roots = [
   "~/.agents/skills/agmsg/db",
   "~/.agents/skills/agmsg/teams"
 ]
+
+[tui]
+status_line = ["model-with-reasoning", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens"]

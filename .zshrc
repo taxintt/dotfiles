@@ -157,6 +157,37 @@ alias k='kubectl'
 ## zenn
 alias zenn='npx zenn'
 
+## Codex local configuration overlay
+codex() {
+  local arg
+  for arg in "$@"; do
+    case "$arg" in
+      -p|--profile|-p?*|--profile=*)
+        command codex "$@"
+        return $?
+        ;;
+    esac
+  done
+  case "$1" in
+    agents|login|logout|plugin|app-server|remote-control|app|completion|update|doctor|exec-server|apply|migrate-rollouts|cloud|features|help|-h|--help|-V|--version)
+      command codex "$@"
+      return $?
+      ;;
+  esac
+  command codex --profile work "$@"
+}
+
+## Codex usage (API-equivalent estimated cost)
+alias codex-usage='npx -y ccusage@latest codex'
+
+codex-usage-watch() {
+  while true; do
+    printf '\033[H\033[2J'
+    npx -y ccusage@latest codex session --compact "$@" || return
+    sleep 10 || return
+  done
+}
+
 ## difit
 alias difit="npx difit"
 

@@ -84,4 +84,3 @@
 
 - 承認後の実装: `tdd-workflow`
 - レビュー: `golang-patterns` の Review Workflow
-

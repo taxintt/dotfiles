@@ -60,21 +60,22 @@ npm run test -- --coverage
 
 シークレット検出は[gitleaks](https://github.com/gitleaks/gitleaks)に任せ、独自のrgパターン・インデックスの一時コピーは使わない。`command -v gitleaks`で利用可否を確認する。未導入ならsecret scanを理由付きSKIPとし、無断インストールしない。この例外はgitleaksに限り、他の設定済み検証のツール不足はFAILのまま。
 
-選択したmodeのコマンドだけを実行する。pre-prではPRの実際のbase branchを確認し、以下のmainを置き換える。
+選択したmodeのコマンドだけを実行する。pre-prではPRのbase repository・remote・branchを確認し、以下のorigin/mainを実際のリモートbase refに置き換える。検証前に `git fetch origin main` でそのrefを更新する。forkのPRではbase repositoryを指すremoteを使う。fetchと `git merge-base origin/main HEAD` の成功を確認してから範囲検査を実行する。取得・基準解決の失敗を空の範囲として通過させずFAILとする。Phase 5と6は同じ更新済みbase refを使う。
 
 ```bash
 # pre-commit: staged内容。作業ツリーや未追跡ファイルは含めない
 gitleaks git --staged --redact=100 --verbose --exit-code=10 .
 
 # pre-pr: PRに含まれる全commit。途中で追加して後で削除したsecretも対象
-gitleaks git --log-opts="main..HEAD" --redact=100 --verbose --exit-code=10 .
+gitleaks git --log-opts="$(git merge-base origin/main HEAD)..HEAD" --redact=100 --verbose --exit-code=10 .
 
-# full: trackedファイルのstaged / unstaged変更をそれぞれ検査
+# full: HEADまでの全履歴とtrackedファイルのstaged / unstaged変更を検査
+gitleaks git --log-opts="HEAD" --redact=100 --verbose --exit-code=10 .
 gitleaks git --staged --redact=100 --verbose --exit-code=10 .
 gitleaks git --pre-commit --redact=100 --verbose --exit-code=10 .
 ```
 
-fullの未追跡ファイルはこのGitスキャンの対象外。`git ls-files --others --exclude-standard`で列挙し、対象外であることをwarningsに記載する。gitignoreされた未追跡ファイル・依存物は検査しない。強制stageされたファイルやignore後もtrackedのファイルはcommitに含まれるため検査対象とする。
+fullの履歴検査は現在のHEADに残るsecretと過去に削除されたsecretも対象とする。初回commit前でHEADが存在しない場合のみ履歴検査を理由付きSKIPとし、staged / unstagedの検査は実行する。fullの未追跡ファイルはこのGitスキャンの対象外。`git ls-files --others --exclude-standard`で列挙し、対象外であることをwarningsに記載する。gitignoreされた未追跡ファイル・依存物は検査しない。強制stageされたファイルやignore後もtrackedのファイルはcommitに含まれるため検査対象とする。
 
 gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
 
@@ -87,8 +88,12 @@ rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
 # pre-commit / full: 秘匿ファイル (.env / credentials.json / id_rsa) のstaging確認
 git diff --cached --name-only --diff-filter=ACMR
 
-# pre-pr: PR差分に含まれる秘匿ファイルの確認（実際のbase branchを使用）
-git diff main...HEAD --name-only --diff-filter=ACMR
+# full: 現在trackedの秘匿ファイルも確認（HEADが無い場合はls-filesのみ）
+git ls-tree -r --name-only HEAD
+git ls-files
+
+# pre-pr: 途中で追加・改名・変更後に削除された秘匿ファイルも確認
+git log --format= --name-only --diff-filter=ACMR "$(git merge-base origin/main HEAD)..HEAD"
 ```
 
 debug scanは作業ツリーの警告として報告し、commit / PR内容の検証済みとは表現しない。`rg`の終了コードは0 = 検出、1 = 検出なし、2以上 = 走査失敗。走査失敗やgitコマンドの失敗、対象範囲に含まれる秘匿ファイルはPhase 5をFAILとする。debug文のみはwarnings扱い（testファイルは理由付きで除外可）。出力を切り詰めず全件確認する。gitleaks未導入時はSecurityをSKIPと表示するが、他のPhase 5チェックに失敗があればFAILを優先する。
@@ -99,9 +104,9 @@ debug scanは作業ツリーの警告として報告し、commit / PR内容の�
 git diff --cached --stat
 git diff --cached
 
-# pre-pr: PRの実際のbase branchを確認し、以下のmainを置き換える
-git diff main...HEAD --stat
-git diff main...HEAD
+# pre-pr: Phase 5と同じ更新済みリモートbase refを使用
+git diff origin/main...HEAD --stat
+git diff origin/main...HEAD
 
 # full: HEADからの作業ツリー全体（staged / unstaged）を確認
 git diff HEAD --stat

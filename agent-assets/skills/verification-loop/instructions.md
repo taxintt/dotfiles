@@ -58,7 +58,7 @@ npm run test -- --coverage
 
 ### Phase 5: Security & Debug Statement Scan
 
-シークレット検出は[gitleaks](https://github.com/gitleaks/gitleaks)に任せ、独自のrgパターン・インデックスの一時コピーは使わない。`command -v gitleaks`で利用可否を確認する。未導入ならsecret scanを理由付きSKIPとし、無断インストールしない。この例外はgitleaksに限り、他の設定済み検証のツール不足はFAILのまま。
+シークレット検出は[gitleaks](https://github.com/gitleaks/gitleaks)に任せ、独自のrgパターンは使わない。`command -v gitleaks`で利用可否を確認する。未導入ならsecret scanを理由付きSKIPとし、無断インストールしない。この例外はgitleaksに限り、他の設定済み検証のツール不足はFAILのまま。
 
 選択したmodeのコマンドだけを実行する。pre-prではPRのbase repository・remote・branchを確認し、以下のorigin/mainを実際のリモートbase refに置き換える。検証前に `git fetch origin main` でそのrefを更新する。forkのPRではbase repositoryを指すremoteを使う。fetchと `git merge-base origin/main HEAD` の成功を確認してから範囲検査を実行する。取得・基準解決の失敗を空の範囲として通過させずFAILとする。Phase 5と6は同じ更新済みbase refを使う。
 
@@ -69,13 +69,18 @@ gitleaks git --staged --redact=100 --verbose --exit-code=10 .
 # pre-pr: PRに含まれる全commit。途中で追加して後で削除したsecretも対象
 gitleaks git --log-opts="$(git merge-base origin/main HEAD)..HEAD" --redact=100 --verbose --exit-code=10 .
 
-# full: HEADまでの全履歴とtrackedファイルのstaged / unstaged変更を検査
-gitleaks git --log-opts="HEAD" --redact=100 --verbose --exit-code=10 .
+# full: staged内容の検査（HEAD・作業ツリーの検査は次の手順）
 gitleaks git --staged --redact=100 --verbose --exit-code=10 .
-gitleaks git --pre-commit --redact=100 --verbose --exit-code=10 .
 ```
 
-fullの履歴検査は現在のHEADに残るsecretと過去に削除されたsecretも対象とする。初回commit前でHEADが存在しない場合のみ履歴検査を理由付きSKIPとし、staged / unstagedの検査は実行する。fullの未追跡ファイルはこのGitスキャンの対象外。`git ls-files --others --exclude-standard`で列挙し、対象外であることをwarningsに記載する。gitignoreされた未追跡ファイル・依存物は検査しない。強制stageされたファイルやignore後もtrackedのファイルはcommitに含まれるため検査対象とする。
+fullでは全履歴を検査しない。上記のstaged検査に加え、次の2つのスナップショットをそれぞれ `gitleaks dir --redact=100 --verbose --exit-code=10 .` で検査する:
+
+- **HEAD**: `git ls-tree -r -z HEAD`で列挙した通常ファイルのblobを `git cat-file blob <object-id>`で読み、元の相対パスに配置する。履歴のpatchではなくHEADのtreeだけを使う。初回commit前でHEADが無い場合のみ理由付きSKIP。
+- **作業ツリー**: `git ls-files -z`で列挙した通常ファイルの現在の内容を元の相対パスに配置する。削除済みファイルはコピーせず、symlinkをたどってリポジトリ外を読み込まない。未追跡ファイルはコピーしない。
+
+一時ディレクトリの作成・配置・スキャン・終了コードの保持・削除は、単一のBash呼び出し内で完結させ、`trap`で失敗時も削除する。呼び出しをまたいでシェル変数を再利用しない。スナップショットをcwdにして実行し、元リポジトリのgitleaks設定を明示する（既存の`.gitleaks.toml`は絶対パスの`--config`、`.gitleaksignore`は`--gitleaks-ignore-path`）。候補の相対パス・行番号・ruleを値を伏せて保持し、後続の確認は元リポジトリの同じ対象（HEADならblob、stagedならindex、作業ツリーなら現在の内容）を使う。配置・走査・削除の失敗はFAILとする。
+
+`gitleaks dir .`を元リポジトリで直接実行しない。gitignoreされた未追跡ファイルも読み込むため、上記のtrackedファイルだけを配置する。fullの未追跡ファイルは対象外として `git ls-files --others --exclude-standard`で列挙し、warningsに記載する。強制stageされたファイルやignore後もtrackedのファイルは検査対象とする。削除済みsecretを含む履歴の検査はpre-prのmerge-base..HEADに限定する。
 
 gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
 

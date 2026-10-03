@@ -6,9 +6,9 @@
 
 - 日本語の技術書の章 / 草稿 / 記事 / 解説文を書くとき（**作成モード**）
 - 既存の日本語技術文を推敲・リライトするとき（**レビューモード**）
-- ユーザーが `/japanese-tech-writing` と明示呼び出ししたとき
+- ユーザーが `japanese-tech-writing` と明示呼び出ししたとき
 
-計画フェーズ（読者分析・アウトライン）は `doc-planning` の担当。本 skill は **文章本体** を扱う。
+本 skill は **文章本体** を扱う。
 
 ## 動作
 
@@ -188,9 +188,3 @@ LLM が大量生成する、中身のない型に誘惑されない。書き上�
 
 本規範は k16shikano 氏の gist「日本語技術文書の文章規範」を vendoring したもの。
 出典: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
-
-## 関連
-
-- `doc-planning` — 執筆前の計画（読者分析・アウトライン）。本 skill は文章本体を扱う。
-- `code-review-routing` — コードのレビュー。本 skill は日本語 prose のレビュー。
-- `doc-workflow-chain` — 計画 → 執筆の一気通貫連鎖。

@@ -5,3 +5,13 @@ model: opus
 ---
 
 [共通本文](shared/instructions.md) を読み、手順に従う。本文中の参考資料は `shared/` を基準に解決する。
+
+## Claude Codeでの連携
+
+計画フェーズ（読者分析・アウトライン）は `doc-planning` の担当。本 skill は **文章本体** を扱う。
+
+## 関連
+
+- `doc-planning` — 執筆前の計画（読者分析・アウトライン）。本 skill は文章本体を扱う。
+- `code-review-routing` — コードのレビュー。本 skill は日本語 prose のレビュー。
+- `doc-workflow-chain` — 計画 → 執筆の一気通貫連鎖。

@@ -2,7 +2,7 @@
 
 set -e
 
-CURRENT_DIR=$(cd "$(dirname "$0")/../"; pwd)
+CURRENT_DIR=$(cd "$(dirname "$0")/../"; pwd -P)
 HOME=$HOME
 
 make_symlink(){
@@ -50,7 +50,13 @@ for skill in "$CURRENT_DIR"/agent-assets/skills/*; do
 			source="$CURRENT_DIR/.claude/skills/${skill##*/}"
 		fi
 		if [ -e "$target" ] || [ -L "$target" ]; then
-			if [ ! -L "$target" ] || [ "$(readlink "$target")" != "$source" ]; then
+			managed=false
+			if [ -L "$target" ]; then
+				case "$(readlink "$target")" in
+					"$source"|*/"${source#"$CURRENT_DIR"/}") managed=true ;;
+				esac
+			fi
+			if [ "$managed" = false ]; then
 				printf 'Unmanaged skill destination: %s\n' "$target" >&2
 				exit 1
 			fi
@@ -78,9 +84,7 @@ make_symlink_under_dir .claude/hooks
 mkdir -p "$HOME/.agents/skills"
 for skill in "$CURRENT_DIR"/agent-assets/skills/*; do
 	target="$HOME/.agents/skills/${skill##*/}"
-	if [ ! -L "$target" ]; then
-		ln -s "$skill" "$target"
-	fi
+	ln -hfs "$skill" "$target"
 done
 
 # AGENTS.md as the single global instruction file for both agents.

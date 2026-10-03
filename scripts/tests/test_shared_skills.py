@@ -45,7 +45,7 @@ class SharedSkillsTest(unittest.TestCase):
 
     def test_unmanaged_collisions_are_preserved(self):
         for location in ('.agents/skills', '.claude/skills'):
-            for kind in ('file', 'directory', 'symlink'):
+            for kind in ('file', 'directory', 'symlink', 'dangling'):
                 with self.subTest(location=location, kind=kind):
                     target = self.home / location / 'golang-patterns'
                     if kind == 'file':
@@ -54,7 +54,7 @@ class SharedSkillsTest(unittest.TestCase):
                         target.mkdir()
                         (target / 'marker').write_text('keep')
                     else:
-                        target.symlink_to('external')
+                        target.symlink_to('missing' if kind == 'dangling' else 'external')
                     try:
                         result = self.install()
                         self.assertNotEqual(result.returncode, 0)
@@ -65,12 +65,41 @@ class SharedSkillsTest(unittest.TestCase):
                         elif kind == 'file':
                             self.assertEqual(target.read_text(), 'keep')
                         else:
-                            self.assertEqual(os.readlink(target), 'external')
+                            self.assertEqual(os.readlink(target), 'missing' if kind == 'dangling' else 'external')
                     finally:
                         if target.is_dir() and not target.is_symlink():
                             shutil.rmtree(target)
                         else:
                             target.unlink()
+
+    def test_reclone_replaces_existing_managed_links(self):
+        self.assertEqual(self.install().returncode, 0)
+        old = self.repo
+        self.repo = old.parent / 'reclone'
+        shutil.copytree(old, self.repo, symlinks=True)
+        self.assertEqual(self.install().returncode, 0)
+        for name in SKILLS:
+            self.assertEqual((self.home / '.agents/skills' / name).resolve(), self.repo / 'agent-assets/skills' / name)
+            self.assertEqual((self.home / '.claude/skills' / name).resolve(), self.repo / '.claude/skills' / name)
+
+    def test_move_replaces_dangling_managed_links(self):
+        self.assertEqual(self.install().returncode, 0)
+        relocated = self.repo.parent / 'moved'
+        self.repo.rename(relocated)
+        self.repo = relocated
+        self.assertEqual(self.install().returncode, 0)
+        for name in SKILLS:
+            self.assertEqual((self.home / '.agents/skills' / name).resolve(), self.repo / 'agent-assets/skills' / name)
+            self.assertEqual((self.home / '.claude/skills' / name).resolve(), self.repo / '.claude/skills' / name)
+
+    def test_symlinked_repository_path(self):
+        self.assertEqual(self.install().returncode, 0)
+        alias = self.repo.parent / 'alias'
+        alias.symlink_to(self.repo)
+        result = subprocess.run(['sh', str(alias / 'scripts/link.sh')], env=dict(os.environ, HOME=str(self.home)), capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name in SKILLS:
+            self.assertEqual((self.home / '.agents/skills' / name).resolve(), self.repo / 'agent-assets/skills' / name)
 
     def test_metadata_and_neutral_body(self):
         for name in SKILLS:

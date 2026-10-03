@@ -41,6 +41,23 @@ make_symlink_under_dir(){
 	echo ' '
 }
 
+# Check shared skill destinations before changing any links.
+for skill in "$CURRENT_DIR"/agent-assets/skills/*; do
+	for runtime in .agents .claude; do
+		target="$HOME/$runtime/skills/${skill##*/}"
+		source="$skill"
+		if [ "$runtime" = .claude ]; then
+			source="$CURRENT_DIR/.claude/skills/${skill##*/}"
+		fi
+		if [ -e "$target" ] || [ -L "$target" ]; then
+			if [ ! -L "$target" ] || [ "$(readlink "$target")" != "$source" ]; then
+				printf 'Unmanaged skill destination: %s\n' "$target" >&2
+				exit 1
+			fi
+		fi
+	done
+done
+
 # make symbolic link
 make_symlink .zshrc
 make_symlink .gitignore
@@ -57,6 +74,14 @@ make_symlink_under_dir .codex
 make_symlink_under_dir .claude/agents
 make_symlink_under_dir .claude/skills
 make_symlink_under_dir .claude/hooks
+
+mkdir -p "$HOME/.agents/skills"
+for skill in "$CURRENT_DIR"/agent-assets/skills/*; do
+	target="$HOME/.agents/skills/${skill##*/}"
+	if [ ! -L "$target" ]; then
+		ln -s "$skill" "$target"
+	fi
+done
 
 # AGENTS.md as the single global instruction file for both agents.
 # Claude Code reads AGENTS.md natively only at project scope, so the

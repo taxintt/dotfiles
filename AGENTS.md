@@ -24,7 +24,8 @@
 - PreCompact — ADR / progress / git state preservation
 
 skill / agent カタログ:
-- skill 一覧 → `~/.claude/skills/*/SKILL.md`
+- Claude Code skill 一覧 → `~/.claude/skills/*/SKILL.md`
+- Codex 共通 skill 一覧 → `~/.agents/skills/*/SKILL.md`
 - agent 一覧 → `~/.claude/agents/*.md` frontmatter
 
 ドメイン別ポインタ:

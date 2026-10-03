@@ -27,7 +27,7 @@
 
 各 Phase には **PASS/FAIL 判定基準** がある。検証コマンドはパイプで出力を切り詰めずに実行し、元コマンドの終了コードとstdout / stderr全体を確認する。表示だけを要約して、元の終了コードを別のコマンドの終了コードで置き換えない。コマンド例は stack 既定 (TS / Python) で、他 stack では**同等コマンドに置換**する（例は Phase 末尾の Stack Adaptation 節）。
 
-検証前にリポジトリの言語・設定・package.jsonのscripts・既存CIを確認し、適用するコマンドを決める。未設定のbuild / lint / testや対象言語のない型チェックは理由付きSKIPとし、存在しないスクリプトを実行しない。設定済みの検証に必要なツールが無い場合や、適用するコマンドが実行に失敗した場合はFAILとする。ツールの不足を理由に検証を黙って省略せず、無断インストールもしない。
+検証前にリポジトリの言語・設定・package.jsonのscripts・既存CIを確認し、適用するコマンドを決める。未設定のbuild / type check / lint / testや対象言語のない型チェックは理由付きSKIPとし、存在しないスクリプトを実行しない。設定済みの検証に必要なツールが無い場合や、適用するコマンドが実行に失敗した場合はFAILとする。ツールの不足を理由に検証を黙って省略せず、無断インストールもしない。
 
 ### Phase 1: Build Verification `[critical]`
 ```bash
@@ -38,7 +38,7 @@ npm run build   # or: pnpm build
 ### Phase 2: Type Check `[critical]`
 ```bash
 npx tsc --noEmit   # TS
-pyright .           # Python
+pyright .           # Python（設定済みの場合のみ。未設定ならSKIP）
 ```
 **PASS/FAIL**: exit code 0 かつ errors = 0 → PASS。それ以外は FAIL。warnings はエラー数にカウントしない。
 
@@ -59,12 +59,12 @@ npm run test -- --coverage
 ### Phase 5: Security & Debug Statement Scan
 ```bash
 # Secrets: 候補の値を伏せ、ファイル名・行番号を表示
-rg -n -o --replace '[REDACTED]' '\bsk-[A-Za-z0-9_-]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\b(?:api_key|apiKey)\b\s*[:=]\s*[\x22\x27][^\x22\x27\r\n]{8,}[\x22\x27]' -g '*.ts' -g '*.js' .
+rg --hidden -g '!.git' -n -o --replace '[REDACTED]' '\bsk-[A-Za-z0-9_-]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\b(?i:[A-Za-z0-9_]*(?:api_key|apiKey))\b\s*[:=]\s*[\x22\x27][^\x22\x27\r\n]{8,}[\x22\x27]' -g '*.ts' -g '*.js' .
 
 # Debug statements（言語別）
-rg -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
-rg -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
-rg -n '^\s*print\(' -g '*.py' .                # Python
+rg --hidden -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
+rg --hidden -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
+rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
 
 # 秘匿ファイル (.env / credentials.json / id_rsa) のstaging有無を一覧から確認
 git diff --cached --name-only
@@ -74,9 +74,20 @@ git diff --cached --name-only
 
 ### Phase 6: Diff Review
 ```bash
-git diff --stat
-git diff HEAD~1 --name-only
+# pre-commit: staged diffを確認（初回commitでも実行可能）
+git diff --cached --stat
+git diff --cached
+
+# pre-pr: PRの実際のbase branchを確認し、以下のmainを置き換える
+git diff main...HEAD --stat
+git diff main...HEAD
+
+# full: HEADからの作業ツリー全体（staged / unstaged）を確認
+git diff HEAD --stat
+git diff HEAD
 ```
+未追跡ファイルは `git status --short` で確認し、commit / PRに含める予定のファイルも読む。pre-prでは未コミット変更をPR差分に含まれるものとして報告しない。fullでHEADがまだ無い場合はpre-commitの差分と未追跡ファイルを確認する。
+
 **PASS/FAIL なし**（informational phase）。変更ファイルごとに「意図しない変更 / エラーハンドリング欠落 / edge case 未考慮」を目視で確認し、気になる点は Issues to Fix に載せる。
 
 ### Stack Adaptation
@@ -88,8 +99,8 @@ skill のコマンドは TS / Python 前提。他 stack では同等に置換す
 | **Go** | `go build ./...` | `go vet ./...` (型検査は build に統合、意味検査として vet を使用) | `golangci-lint run ./...` | `go test ./... -cover -race` |
 | **Rust** | `cargo build` | `cargo check` | `cargo clippy --all-targets -- -D warnings` | `cargo test -- --nocapture` |
 | **Shell / Markdown** | N/A（build設定なし） | N/A | 設定済みlintと変更したshellの構文チェック | 設定済みのテストのみ。未設定ならN/A |
-| **未設定の検証** | build設定なしならN/A | 型チェック対象なしならN/A | lint設定なしならN/A | テスト設定なしならN/A |
-| **Python** | `python -m build` or n/a | `pyright .` or `mypy .` | `ruff check .` | `pytest --cov` |
+| **未設定の検証** | build設定なしならN/A | 型チェッカー未設定・対象なしならN/A | lint設定なしならN/A | テスト設定なしならN/A |
+| **Python** | `python -m build` or n/a | 設定済みの `pyright .` / `mypy .`。未設定ならN/A | `ruff check .` | `pytest --cov` |
 
 Security scan の `rg` 拡張子もリポジトリに存在する言語に合わせて置換（Go: `*.go`, Rust: `*.rs`, Python: `*.py`, shell: `*.sh` 等）。存在するリポジトリ直下を対象にし、固定のsrc/を前提にしない。該当言語のファイルが無ければその言語のdebug scanは適用外。security scanとstaging確認は実行する。
 

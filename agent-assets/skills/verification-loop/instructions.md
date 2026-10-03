@@ -57,29 +57,41 @@ npm run test -- --coverage
 - Total tests: X / Passed: X / Failed: X / Coverage: X%
 
 ### Phase 5: Security & Debug Statement Scan
+
+シークレット検出は[gitleaks](https://github.com/gitleaks/gitleaks)に任せ、独自のrgパターン・インデックスの一時コピーは使わない。`command -v gitleaks`で利用可否を確認する。未導入ならsecret scanを理由付きSKIPとし、無断インストールしない。この例外はgitleaksに限り、他の設定済み検証のツール不足はFAILのまま。
+
+選択したmodeのコマンドだけを実行する。pre-prではPRの実際のbase branchを確認し、以下のmainを置き換える。
+
 ```bash
-# pre-commit: インデックス全体を一時ディレクトリへ展開する。
-# 各コマンドの終了コードを確認し、失敗したらスキャンせずPhase 5をFAILにする。
-scan_dir=$(mktemp -d)
-git checkout-index --all --prefix="$scan_dir/"
-# このmodeの以下のrgは、末尾の . を "$scan_dir" に置き換える。
-# full / pre-prは作業ツリーの . を対象とする。
+# pre-commit: staged内容。作業ツリーや未追跡ファイルは含めない
+gitleaks git --staged --redact=100 --verbose --exit-code=10 .
 
-# Secrets: 拡張子・ignore設定によらずテキストを検査し、値を伏せて表示
-rg --hidden --no-ignore -g '!.git' -n -o --replace '[REDACTED]' '\bsk-[A-Za-z0-9_-]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\b(?i:[A-Za-z0-9_]*(?:api_key|apiKey))\b[\x22\x27]?\s*[:=]\s*[\x22\x27]?[^\s\x22\x27#,;}]{8,}' .
+# pre-pr: PRに含まれる全commit。途中で追加して後で削除したsecretも対象
+gitleaks git --log-opts="main..HEAD" --redact=100 --verbose --exit-code=10 .
 
-# Debug statements（言語別）
-rg --hidden --no-ignore -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
-rg --hidden --no-ignore -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
-rg --hidden --no-ignore -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
-
-# 秘匿ファイル (.env / credentials.json / id_rsa) のstaging有無を一覧から確認
-git diff --cached --name-only
+# full: trackedファイルのstaged / unstaged変更をそれぞれ検査
+gitleaks git --staged --redact=100 --verbose --exit-code=10 .
+gitleaks git --pre-commit --redact=100 --verbose --exit-code=10 .
 ```
-pre-commitでは各コマンドの終了コードと候補確認の結果を保持してから、一時展開先を削除する（`rm -rf -- "$scan_dir"`）。削除の終了コードでスキャン結果を置き換えない。
 
-`rg` の終了コードは 0 = 検出、1 = 検出なし、2以上 = 走査失敗。検出なしは正常だが、走査失敗やgitコマンドの失敗はPhase 5をFAILとする。出力を切り詰めず全件確認し、secretの値はレポートに載せない。
-**PASS/FAIL**: 候補のファイル・行番号を確認し、実際のsecretと誤検知を区別する。未解決の候補、確認されたsecret、または秘匿ファイルのstagingがあればFAIL。すべて誤検知と確認でき、秘匿ファイルstaged = 0ならPASS。debug 文は warnings 扱いで Issues to Fix へ（test ファイルは除外可）。ダミー値・変数名などの誤検知は理由をReportに記載して除外できる。pre-commitの候補確認も作業ツリーではなく一時展開先の内容を使い、パスはリポジトリ相対にして報告する。候補確認時も値を出力せず、ファイル名・行番号・判定理由だけを報告する。
+fullの未追跡ファイルはこのGitスキャンの対象外。`git ls-files --others --exclude-standard`で列挙し、対象外であることをwarningsに記載する。gitignoreされた未追跡ファイル・依存物は検査しない。強制stageされたファイルやignore後もtrackedのファイルはcommitに含まれるため検査対象とする。
+
+gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
+
+```bash
+# Debug statements: 作業ツリーの警告。gitignoreを尊重し隠しディレクトリも見る
+rg --hidden -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g '*.js' -g '*.jsx' .   # JS/TS
+rg --hidden -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
+rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
+
+# pre-commit / full: 秘匿ファイル (.env / credentials.json / id_rsa) のstaging確認
+git diff --cached --name-only --diff-filter=ACMR
+
+# pre-pr: PR差分に含まれる秘匿ファイルの確認（実際のbase branchを使用）
+git diff main...HEAD --name-only --diff-filter=ACMR
+```
+
+debug scanは作業ツリーの警告として報告し、commit / PR内容の検証済みとは表現しない。`rg`の終了コードは0 = 検出、1 = 検出なし、2以上 = 走査失敗。走査失敗やgitコマンドの失敗、対象範囲に含まれる秘匿ファイルはPhase 5をFAILとする。debug文のみはwarnings扱い（testファイルは理由付きで除外可）。出力を切り詰めず全件確認する。gitleaks未導入時はSecurityをSKIPと表示するが、他のPhase 5チェックに失敗があればFAILを優先する。
 
 ### Phase 6: Diff Review
 ```bash
@@ -111,7 +123,7 @@ skill のコマンドは TS / Python 前提。他 stack では同等に置換す
 | **未設定の検証** | build設定なしならN/A | 型チェッカー未設定・対象なしならN/A | lint設定なしならN/A | テスト設定なしならN/A |
 | **Python** | `python -m build` or n/a | 設定済みの `pyright .` / `mypy .`。未設定ならN/A | `ruff check .` | `pytest --cov` |
 
-secret scanは拡張子で制限しない。.env・JSON・YAML・TOML・dotfileも含め、引用符のない設定値も検査する。debug scanだけリポジトリに存在する言語の拡張子を指定する。pre-commitはインデックスの一時展開先、full / pre-prは存在するリポジトリ直下を対象とし、固定のsrc/を前提にしない。該当言語のファイルが無ければその言語のdebug scanは適用外。security scanとstaging確認は実行する。
+secret scanは言語の拡張子で制限せず、modeごとのGit対象をgitleaksで検査する。debug scanだけリポジトリに存在する言語の拡張子を指定し、存在するリポジトリ直下を対象とする。固定のsrc/を前提にしない。該当言語のファイルが無ければその言語のdebug scanは適用外。
 
 ## Overall 判定アルゴリズム
 
@@ -119,7 +131,7 @@ secret scanは拡張子で制限しない。.env・JSON・YAML・TOML・dotfile�
 
 - **NOT READY** if 実行対象のPhase 1〜5のいずれかがFAIL。lintエラー・secret検出・秘匿ファイルのstagingも通過扱いにしない。
 - **READY with warnings** if 適用する検証がすべてPASSで、lint warning・debug文・Diff Reviewの指摘がある → Issues to Fixに列挙の上、ユーザー判断。
-- **READY** if 適用する検証がすべてPASSで、warningsなし。
+- **READY** if 適用する検証がすべてPASSで、warningsなし。gitleaks未導入やfullの未追跡ファイルによる未検証範囲がある場合はREADY with warningsとし、secret検査済みとは報告しない。
 
 選択したmodeで対象外のPhaseはSKIPと表示する。READYは選択したmodeについての判定であり、quick / pre-commitの結果をfull / pre-prの検証済みとして報告しない。リポジトリで未設定・適用外の検証も理由付きSKIPとする。設定済みの検証をツール不足などで実行できなかった場合はFAILとし、成功扱いにしない。SKIP項目をPASSと表示せず、READYには実施した検証と未実施の理由を併記する。
 

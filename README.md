@@ -72,4 +72,4 @@ make help
 MIT — see [LICENSE](LICENSE). Some material is derived from third parties:
 
 - `agent-assets/skills/japanese-tech-writing/` — from a gist by k16shikano (Unlicense)
-- `.claude/skills/systematic-debugging/`, `.claude/skills/verification-before-completion/` — based on [obra/superpowers](https://github.com/obra/superpowers) (MIT)
+- `.claude/skills/systematic-debugging/`, `agent-assets/skills/verification-before-completion/` — based on [obra/superpowers](https://github.com/obra/superpowers) (MIT)

@@ -37,7 +37,7 @@ npm run build   # or: pnpm build
 
 ### Phase 2: Type Check `[critical]`
 ```bash
-npx tsc --noEmit   # TS
+./node_modules/.bin/tsc --noEmit   # TS（ローカルに無ければFAIL。インストールしない）
 pyright .           # Python（設定済みの場合のみ。未設定ならSKIP）
 ```
 **PASS/FAIL**: exit code 0 かつ errors = 0 → PASS。それ以外は FAIL。warnings はエラー数にカウントしない。
@@ -82,7 +82,7 @@ fullでは全履歴を検査しない。上記のstaged検査に加え、次の2
 
 `gitleaks dir .`を元リポジトリで直接実行しない。gitignoreされた未追跡ファイルも読み込むため、上記のtrackedファイルだけを配置する。fullの未追跡ファイルは対象外として `git ls-files --others --exclude-standard`で列挙し、warningsに記載する。強制stageされたファイルやignore後もtrackedのファイルは検査対象とする。削除済みsecretを含む履歴の検査はpre-prのmerge-base..HEADに限定する。
 
-gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。ただし`.gitleaksignore`のfingerprintは検査モードで異なる。commit hash付きのfingerprintで登録したエントリは、commit hashを持たないfullのdir検査のfingerprintと一致せず、同じ候補を除外できない。自動でcommit hashを削ったり除外を追加したりせず、誤検知と確認した候補についてdirの出力どおりのfingerprintが必要であることを報告する。除外設定の変更は依頼範囲で行い、該当modeで再実行する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
+gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。ただし`.gitleaksignore`のfingerprintは検査モードで異なる。commit hash付きのfingerprintで登録したエントリは、commit hashを持たないfullのdir検査やpre-commit / fullの `gitleaks git --staged` 検査のfingerprintと一致せず、同じ候補を除外できない。自動でcommit hashを削ったり除外を追加したりせず、誤検知と確認した候補について該当するdir / staged検査が出力するcommit hashなしの `file:rule:line` 形式のfingerprintが必要であることを報告する。これはモード間の識別子の違いであり、ignoreファイルの破損とは扱わない。除外設定の変更は依頼範囲で行い、該当modeで再実行する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
 
 ```bash
 # Debug statements: 作業ツリーの警告。gitignoreを尊重し隠しディレクトリも見る

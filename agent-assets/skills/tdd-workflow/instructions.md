@@ -82,7 +82,7 @@
 
 - **Go**: `golang-testing` skill を併読。table-driven test, subtest 命名, `tt := tt` キャプチャ, `go test -cover -race` を採用。初回は `errNotImplemented` stub でコンパイル可能な RED を作る。
 - **TypeScript**: 同ディレクトリの `patterns-ts.md` を併読。pure util / React コンポーネント / API integration / E2E / モック の 5 カテゴリからシナリオに該当するものを選ぶ。初回は `throw new Error('Not implemented')` stub で RED を作る。
-- **他言語**: 言語固有 skill が無ければ、本 SKILL.md の原則（RED → GREEN → REFACTOR、AAA、80% coverage、behavior テスト）をそのまま適用。
+- **他言語**: 言語固有 skill が無ければ、本文の原則（RED → GREEN → REFACTOR、AAA、80% coverage、behavior テスト）をそのまま適用。
 
 ## スカフォールドの基本形
 

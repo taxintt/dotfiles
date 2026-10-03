@@ -5,7 +5,3 @@ model: sonnet
 ---
 
 [共通本文](shared/instructions.md) を読み、手順に従う。本文中の参考資料は `shared/` を基準に解決する。
-
-## Claude Codeでの参考資料
-
-`tdd-workflow/testing-anti-patterns.md` を併読する。バグ修正時の逆フェーズ検証は `tdd-workflow/regression-testing.md` を参照する。

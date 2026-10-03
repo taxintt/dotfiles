@@ -283,7 +283,7 @@ TDD の規律は Go でも同じ:
 - [ ] テストが互いに依存している（実行順序で結果が変わる）
 - [ ] flaky test を「再実行で通ることもある」と放置している
 
-バグ修正時は逆フェーズ検証（修正 revert → FAIL）を必須とする。
+`tdd-workflow` skillを読み込み、その入口が示す共通本文の配置先を基準に `testing-anti-patterns.md` を併読する。バグ修正時は同じ配置先の `regression-testing.md` を参照し、逆フェーズ検証（修正 revert → FAIL）を必須とする。
 
 ## Verification Checklist (コミット前)
 

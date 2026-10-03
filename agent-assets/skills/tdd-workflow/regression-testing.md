@@ -148,5 +148,5 @@ Step 4 を飛ばした PR は「テストがバグを検知している証拠が
 
 ## 関連
 
-- `tdd-workflow/SKILL.md` — Iron Law, RED/GREEN verification checkpoint
-- `tdd-workflow/testing-anti-patterns.md` — モックの落とし穴
+- `instructions.md` — Iron Law, RED/GREEN verification checkpoint
+- `testing-anti-patterns.md` — モックの落とし穴

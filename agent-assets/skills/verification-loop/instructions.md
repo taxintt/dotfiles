@@ -37,9 +37,11 @@ npm run build   # or: pnpm build
 
 ### Phase 2: Type Check `[critical]`
 ```bash
-./node_modules/.bin/tsc --noEmit   # TS（ローカルに無ければFAIL。インストールしない）
+npm run typecheck   # JS/TSの例。実際のpackage manager・workspaceの設定済みscriptを使用
 pyright .           # Python（設定済みの場合のみ。未設定ならSKIP）
 ```
+JS/TSはpackage.json・workspace・既存CIを確認し、リポジトリの型チェックscriptを設定済みのpackage manager経由で実行する（例: `yarn typecheck` / `pnpm --filter <package> run typecheck`）。コンパイラのパスを固定せず、scriptが未設定なら理由付きSKIP。scriptがあるのに必要なツールが無い場合やscriptの失敗はFAIL。
+
 **PASS/FAIL**: exit code 0 かつ errors = 0 → PASS。それ以外は FAIL。warnings はエラー数にカウントしない。
 
 ### Phase 3: Lint Check
@@ -91,19 +93,24 @@ rg --hidden -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log �
 rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
 
 # pre-commit / full: 秘匿ファイル (.env / credentials.json / id_rsa) のstaging確認
-git diff --cached --name-only --diff-filter=ACMR
+git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
 
 # full: 現在trackedの秘匿ファイルも確認（HEADが無い場合はls-filesのみ）
-git ls-tree -r --name-only HEAD
-git ls-files
+git ls-tree -r --name-only HEAD | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
+git ls-files | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
 
 # pre-pr: 途中で追加・改名・変更後に削除された秘匿ファイルも確認
-git log --format= --name-only --diff-filter=ACMR "$(git merge-base origin/main HEAD)..HEAD"
+git log --format= --name-only --diff-filter=ACMR "$(git merge-base origin/main HEAD)..HEAD" | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
 ```
+
+秘匿ファイル名は各ディレクトリの `.env`・`.env.*`・`credentials.json`・`id_rsa` と定義し、上記のgrepで該当パスだけ表示する。各パイプラインはBashで実行し、直後に `scan_status=("${PIPESTATUS[@]}")` を同じ呼び出し内で保存する。Git側は0以外ならFAIL、grep側は0 = 該当あり、1 = 該当なし、2以上 = 失敗。該当ありと失敗はFAILとし、後続コマンドの成功で置き換えない。
 
 debug scanは作業ツリーの警告として報告し、commit / PR内容の検証済みとは表現しない。`rg`の終了コードは0 = 検出、1 = 検出なし、2以上 = 走査失敗。走査失敗やgitコマンドの失敗、対象範囲に含まれる秘匿ファイルはPhase 5をFAILとする。debug文のみはwarnings扱い（testファイルは理由付きで除外可）。出力を切り詰めず全件確認する。gitleaks未導入時はSecurityをSKIPと表示するが、他のPhase 5チェックに失敗があればFAILを優先する。
 
 ### Phase 6: Diff Review
+
+pre-prでは検証開始前とPhase 1〜6の終了後に `git status --porcelain --untracked-files=all` を実行する。コマンドの失敗または空でない出力はFAIL / NOT READYとし、未commitのstaged・unstaged・未追跡変更を残したままPR検証済みと報告しない。
+
 ```bash
 # pre-commit: staged diffを確認（初回commitでも実行可能）
 git diff --cached --stat
@@ -119,7 +126,7 @@ git diff HEAD
 ```
 未追跡ファイルは `git status --short` で確認し、commit / PRに含める予定のファイルも読む。pre-prでは未コミット変更をPR差分に含まれるものとして報告しない。fullでHEADがまだ無い場合はpre-commitの差分と未追跡ファイルを確認する。
 
-**PASS/FAIL なし**（informational phase）。変更ファイルごとに「意図しない変更 / エラーハンドリング欠落 / edge case 未考慮」を目視で確認し、気になる点は Issues to Fix に載せる。
+差分の目視レビューはinformational。ただしpre-prのgit status確認は上記のPASS/FAILゲートとする。変更ファイルごとに「意図しない変更 / エラーハンドリング欠落 / edge case 未考慮」を目視で確認し、気になる点は Issues to Fix に載せる。
 
 ### Stack Adaptation
 
@@ -139,7 +146,7 @@ secret scanは言語の拡張子で制限せず、modeごとのGit対象をgitle
 
 最終判定 `READY` / `NOT READY`:
 
-- **NOT READY** if 実行対象のPhase 1〜5のいずれかがFAIL。lintエラー・secret検出・秘匿ファイルのstagingも通過扱いにしない。
+- **NOT READY** if 実行対象のPhase 1〜5のいずれか、またはpre-prのgit statusゲートがFAIL。lintエラー・secret検出・秘匿ファイルのstagingも通過扱いにしない。
 - **READY with warnings** if FAILがなく、lint warning・debug文・Diff Reviewの指摘・gitleaks未導入によるSKIP・fullの未追跡ファイルによる未検証範囲のいずれかがある。Issues to Fixに理由と未検証範囲を列挙し、secret検査を省略した場合は検査済みと報告しない。
 - **READY** if 適用する検証がすべてPASSで、上記のwarnings・未検証範囲がない。未設定・適用外のチェックは理由付きSKIPのまま記載する。
 
@@ -160,6 +167,7 @@ Lint:      [PASS/FAIL/SKIP] (X warnings)
 Tests:     [PASS/FAIL/SKIP] (X/Y passed, Z% coverage)
 Security:  [PASS/FAIL/SKIP] (X issues)
 Diff:      [X files changed]
+Git status: [PASS/FAIL/SKIP] (pre-prの開始前・終了後ゲート)
 
 Overall:   [READY/READY with warnings/NOT READY] for selected mode
 

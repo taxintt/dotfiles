@@ -6,11 +6,11 @@
 
 ### 目的
 - ユーザーからの明示的な調査依頼を待つ
-- 自律的な調査開始を防ぐ（`disable-model-invocation: true`）
+- 自律的な調査開始を防ぐ
 
 ### チェックリスト
 - [ ] ユーザーが調査トピックを明示しているか確認
-- [ ] `/deep-research [topic]` の形式で呼び出されているか確認
+- [ ] 調査トピックを伴う明示的な依頼か確認
 - [ ] 質問形式の場合は調査を開始せず、質問に答える
 
 ### 注意事項
@@ -27,7 +27,7 @@
 
 ### 実行手順
 
-#### 1. AskUserQuestionで以下を確認
+#### 1. ユーザーとの対話で以下を確認
 
 ```markdown
 以下の点について確認させてください：
@@ -150,11 +150,11 @@
 
 #### 1. Overview検索（広く浅く）
 
-```bash
-# WebSearchで全体像を把握
-WebSearch("Next.js vs Remix 2025")
-WebSearch("Remix enterprise adoption")
-WebSearch("Next.js performance benchmarks")
+```text
+# Web検索で全体像を把握
+Web検索("Next.js vs Remix 2025")
+Web検索("Remix enterprise adoption")
+Web検索("Next.js performance benchmarks")
 ```
 
 収集した情報から：
@@ -164,10 +164,10 @@ WebSearch("Next.js performance benchmarks")
 
 #### 2. Deep Dive検索（深く詳しく）
 
-```bash
-# WebFetchで詳細分析
-WebFetch("https://nextjs.org/docs/app/building-your-application/rendering")
-WebFetch("https://remix.run/docs/en/main/guides/performance")
+```text
+# ページ取得で詳細分析
+ページ取得("https://nextjs.org/docs/app/building-your-application/rendering")
+ページ取得("https://remix.run/docs/en/main/guides/performance")
 
 # GitHub調査
 gh api repos/vercel/next.js | jq '.stargazers_count, .open_issues_count'
@@ -182,26 +182,26 @@ gh search issues --repo vercel/next.js "enterprise authentication" --limit 10
 
 #### 3. Validation検索（検証と最新化）
 
-```bash
+```text
 # 最新情報の確認
-WebSearch("Next.js security vulnerabilities 2025")
-WebSearch("Remix roadmap 2025")
+Web検索("Next.js security vulnerabilities 2025")
+Web検索("Remix roadmap 2025")
 
 # 実装事例
-WebSearch("Next.js enterprise case studies")
+Web検索("Next.js enterprise case studies")
 gh search code "remix enterprise" --language typescript
 ```
 
 ### 並列検索の活用
 
-独立したサブ質問は並列で調査する。Claude Code では **単一メッセージ内に複数のツール呼び出しを並べる** ことで並列実行される（shell の `&` 記法ではない）：
+独立したサブ質問は並列で調査する。利用環境の並列ツール呼び出し機能を使う：
 
 ```
 # 1 つの assistant メッセージで以下を同時に発行
-WebSearch("Next.js performance")
-WebSearch("Remix performance")
-WebFetch("https://nextjs.org/docs/security")
-WebFetch("https://remix.run/docs/security")
+Web検索("Next.js performance")
+Web検索("Remix performance")
+ページ取得("https://nextjs.org/docs/security")
+ページ取得("https://remix.run/docs/security")
 ```
 
 並列単位の目安: Overview フェーズで 3-5 件、Deep Dive では独立したサブ質問単位で 2-3 件ずつ並列化。
@@ -357,7 +357,7 @@ WebFetch("https://remix.run/docs/security")
 
 ### 効率化
 - 独立したサブ質問は並列で調査
-- WebSearchで候補を絞り、WebFetchで詳細確認
+- Web検索で候補を絞り、ページ取得で詳細確認
 - GitHub APIで効率的にリポジトリ情報を取得
 
 ### 品質担保

@@ -92,18 +92,45 @@ rg --hidden -g '!.git' -n 'console\.log|console\.debug' -g '*.ts' -g '*.tsx' -g 
 rg --hidden -g '!.git' -n 'fmt\.Println|log\.Println' -g '*.go' .   # Go (log パッケージ運用例外を除く)
 rg --hidden -g '!.git' -n '^\s*print\(' -g '*.py' .                # Python
 
-# pre-commit / full: 秘匿ファイル (.env / credentials.json / id_rsa) のstaging確認
-git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
-
-# full: 現在trackedの秘匿ファイルも確認（HEADが無い場合はls-filesのみ）
-git ls-tree -r --name-only HEAD | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
-git ls-files | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
-
-# pre-pr: 途中で追加・改名・変更後に削除された秘匿ファイルも確認
-git log --format= --name-only --diff-filter=ACMR "$(git merge-base origin/main HEAD)..HEAD" | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)'
 ```
 
-秘匿ファイル名は各ディレクトリの `.env`・`.env.*`・`credentials.json`・`id_rsa` と定義し、上記のgrepで該当パスだけ表示する。各パイプラインはBashで実行し、直後に `scan_status=("${PIPESTATUS[@]}")` を同じ呼び出し内で保存する。Git側は0以外ならFAIL、grep側は0 = 該当あり、1 = 該当なし、2以上 = 失敗。該当ありと失敗はFAILとし、後続コマンドの成功で置き換えない。
+秘匿ファイル名は各ディレクトリの `.env`・`.env.*`・`credentials.json`・`id_rsa` と定義する。ただし `.env.example`・`.env.sample`・`.env.template` は名前チェックから除外する。中身のsecret検査はgitleaksで継続する。
+
+以下を**1回の呼び出しでそのまま実行**し、引数のpre-commitを選択したmodeに、origin/mainを確認済みのbase refに置き換える。ログインshellがzshでも明示したBash内で終了コードを保持する。終了コード0 = 該当なし、10 = 秘匿ファイルあり、2 = 実行失敗。10と2はPhase 5をFAILとする。
+
+```bash
+bash -s -- pre-commit origin/main <<'BASH'
+check_names() {
+  "$@" | grep -E '(^|/)(\.env($|\.)|credentials\.json$|id_rsa$)' | grep -Ev '(^|/)\.env\.(example|sample|template)$'
+  local scan_status=("${PIPESTATUS[@]}")
+  if (( scan_status[0] != 0 || scan_status[1] > 1 || scan_status[2] > 1 )); then
+    return 2
+  fi
+  if (( scan_status[2] == 0 )); then
+    return 10
+  fi
+  return 0
+}
+case "$1" in
+  pre-commit)
+    check_names git diff --cached --name-only --diff-filter=ACMR
+    ;;
+  full)
+    check_names git diff --cached --name-only --diff-filter=ACMR || exit "$?"
+    check_names git ls-files || exit "$?"
+    # 初回commit前はHEADの検査を理由付きSKIP
+    if git rev-parse --verify HEAD >/dev/null 2>&1; then
+      check_names git ls-tree -r --name-only HEAD
+    fi
+    ;;
+  pre-pr)
+    base=$(git merge-base "$2" HEAD) || exit 2
+    check_names git log --format= --name-only --diff-filter=ACMR "$base..HEAD"
+    ;;
+  *) exit 2 ;;
+esac
+BASH
+```
 
 debug scanは作業ツリーの警告として報告し、commit / PR内容の検証済みとは表現しない。`rg`の終了コードは0 = 検出、1 = 検出なし、2以上 = 走査失敗。走査失敗やgitコマンドの失敗、対象範囲に含まれる秘匿ファイルはPhase 5をFAILとする。debug文のみはwarnings扱い（testファイルは理由付きで除外可）。出力を切り詰めず全件確認する。gitleaks未導入時はSecurityをSKIPと表示するが、他のPhase 5チェックに失敗があればFAILを優先する。
 

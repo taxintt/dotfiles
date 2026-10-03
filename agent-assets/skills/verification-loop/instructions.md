@@ -82,7 +82,7 @@ fullでは全履歴を検査しない。上記のstaged検査に加え、次の2
 
 `gitleaks dir .`を元リポジトリで直接実行しない。gitignoreされた未追跡ファイルも読み込むため、上記のtrackedファイルだけを配置する。fullの未追跡ファイルは対象外として `git ls-files --others --exclude-standard`で列挙し、warningsに記載する。強制stageされたファイルやignore後もtrackedのファイルは検査対象とする。削除済みsecretを含む履歴の検査はpre-prのmerge-base..HEADに限定する。
 
-gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
+gitleaksの終了コードは0 = 検出なし、10 = 検出あり、それ以外 = 実行失敗。各コマンドの終了コード・stdout / stderrを確認する。検出・実行失敗・未解決候補はFAIL。既存の`.gitleaks.toml` / `.gitleaksignore`による除外を尊重する。ただし`.gitleaksignore`のfingerprintは検査モードで異なる。commit hash付きのfingerprintで登録したエントリは、commit hashを持たないfullのdir検査のfingerprintと一致せず、同じ候補を除外できない。自動でcommit hashを削ったり除外を追加したりせず、誤検知と確認した候補についてdirの出力どおりのfingerprintが必要であることを報告する。除外設定の変更は依頼範囲で行い、該当modeで再実行する。誤検知と確認した場合は理由とfingerprintを報告し、除外設定を変更するならユーザーの依頼範囲で行って再実行する。secretの値は表示せず、ファイル名・行番号・commit・ruleだけを報告する。
 
 ```bash
 # Debug statements: 作業ツリーの警告。gitignoreを尊重し隠しディレクトリも見る
@@ -140,8 +140,8 @@ secret scanは言語の拡張子で制限せず、modeごとのGit対象をgitle
 最終判定 `READY` / `NOT READY`:
 
 - **NOT READY** if 実行対象のPhase 1〜5のいずれかがFAIL。lintエラー・secret検出・秘匿ファイルのstagingも通過扱いにしない。
-- **READY with warnings** if 適用する検証がすべてPASSで、lint warning・debug文・Diff Reviewの指摘がある → Issues to Fixに列挙の上、ユーザー判断。
-- **READY** if 適用する検証がすべてPASSで、warningsなし。gitleaks未導入やfullの未追跡ファイルによる未検証範囲がある場合はREADY with warningsとし、secret検査済みとは報告しない。
+- **READY with warnings** if FAILがなく、lint warning・debug文・Diff Reviewの指摘・gitleaks未導入によるSKIP・fullの未追跡ファイルによる未検証範囲のいずれかがある。Issues to Fixに理由と未検証範囲を列挙し、secret検査を省略した場合は検査済みと報告しない。
+- **READY** if 適用する検証がすべてPASSで、上記のwarnings・未検証範囲がない。未設定・適用外のチェックは理由付きSKIPのまま記載する。
 
 選択したmodeで対象外のPhaseはSKIPと表示する。READYは選択したmodeについての判定であり、quick / pre-commitの結果をfull / pre-prの検証済みとして報告しない。リポジトリで未設定・適用外の検証も理由付きSKIPとする。設定済みの検証をツール不足などで実行できなかった場合はFAILとし、成功扱いにしない。SKIP項目をPASSと表示せず、READYには実施した検証と未実施の理由を併記する。
 

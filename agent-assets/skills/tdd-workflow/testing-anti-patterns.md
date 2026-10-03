@@ -149,7 +149,7 @@ it('does something', () => {
 
 ## 関連
 
-- `tdd-workflow/SKILL.md` — Iron Law と Rationalization Table
-- `tdd-workflow/regression-testing.md` — バグ修正時の逆フェーズ検証
-- `tdd-workflow/patterns-ts.md` — TS 具体パターン
+- `instructions.md` — Iron Law と Rationalization Table
+- `regression-testing.md` — バグ修正時の逆フェーズ検証
+- `patterns-ts.md` — TS 具体パターン
 - `golang-testing` skill — Go specific

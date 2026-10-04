@@ -19,20 +19,14 @@ fi
 
 # Search for markdown files containing the query
 # Use ripgrep for fast searching
-# Prefer system rg, fall back to Claude's built-in ripgrep
-# Note: unset CLAUDECODE to avoid nested session restriction when using claude --ripgrep
-if command -v rg &> /dev/null; then
-    rg_search() {
-        rg "$@"
-    }
-elif CLAUDE_BIN=$(command -v claude 2>/dev/null) && [[ -n "$CLAUDE_BIN" ]]; then
-    rg_search() {
-        CLAUDECODE="" "$CLAUDE_BIN" --ripgrep "$@"
-    }
-else
+if ! command -v rg &> /dev/null; then
     echo "Error: ripgrep (rg) not found. Please install it: brew install ripgrep" >&2
     exit 1
 fi
+
+rg_search() {
+    rg "$@"
+}
 
 echo "## 🔍 Obsidian Vault Search Results for: \"$QUERY\""
 echo ""
@@ -98,4 +92,4 @@ while IFS= read -r FILE; do
 done <<< "$UNIQUE_FILES"
 
 echo "---"
-echo "*💡 Tip: Use \`/obsidian-context <query>\` to search for different keywords*"
+echo "*💡 Tip: Use \`obsidian-context <query>\` to search for different keywords*"

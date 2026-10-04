@@ -1,5 +1,7 @@
 # Deep Research フェーズ別実行ガイド
 
+このskillは明示的な調査依頼からのみ開始する。Codexの `agents/openai.yaml` は暗黙起動を無効化し、Claude Codeのentrypointは `disable-model-invocation: true` で同じ境界を保つ。
+
 各フェーズの詳細な実行手順とチェックリストです。
 
 ## Phase 1: Wait for User Input

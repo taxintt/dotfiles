@@ -33,7 +33,7 @@
       "Bash(mysql:*)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -98,7 +98,8 @@
     "codex@openai-codex": true,
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
-    "clickhouse-best-practices@claude-plugins-official": true
+    "clickhouse-best-practices@claude-plugins-official": true,
+    "explainer@explainer": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -129,6 +130,12 @@
       "source": {
         "source": "github",
         "repo": "supabase/agent-skills"
+      }
+    },
+    "explainer": {
+      "source": {
+        "source": "github",
+        "repo": "mizchi/explainer"
       }
     }
   },

@@ -75,6 +75,42 @@ make link
 同じ名前のファイルがすでにある場合は上書きします。
 削除されたスキル・エージェントを指す既存のホーム側シンボリックリンクは、リンク先を確認して手動で削除してください。`make link` は不要になったリンクを自動削除しません。
 
+## pstack plugin
+
+[pstack](https://github.com/michael-denyer/pstack-claude)をClaude CodeとCodexで使用します。
+汎用的な開発タスクは `poteto-mode` を入口にし、必要なワークフローへ振り分けます。
+
+### Claude Code
+
+`make link` で配置する `.claude/settings.json` にmarketplaceとpluginの有効化設定を含めています。
+新しいセッションで `/plugin` からインストール状態を確認し、未導入なら次を実行します。
+
+```text
+/plugin marketplace add michael-denyer/pstack-claude
+/plugin install pstack@pstack-claude
+```
+
+`/pstack:poteto-mode` で呼び出せます。初期設定や自動ルーティングの変更は `/pstack:setup-pstack` を使用します。
+
+### Codex
+
+Codex CLIのpluginコマンドで登録・導入します。
+
+```bash
+codex plugin marketplace add michael-denyer/pstack-claude
+codex plugin add pstack@pstack-claude
+```
+
+新しいセッションでpluginの読み込みを確認し、`/hooks` でpstackのSessionStart hookを確認・信頼すると自動ルーティングが有効になります。
+hookの定義が更新された場合は再確認が必要です。`poteto-mode` を名前で指定して呼び出すこともできます。
+並列エージェントを使うため、管理対象の `.codex/config.toml` で `multi_agent` を有効にしています。
+
+### 動作確認
+
+Claude CodeとCodexの両方で `poteto-mode` を明示し、読み取り専用のリポジトリ調査を依頼して、スキルが読み込まれることを確認します。
+自動ルーティングは新しいセッションで複数工程の調査を依頼して確認します。
+pluginの登録・インストールだけでは、セッションでの読み込みやhookの実行確認は完了しません。
+
 ## その他のコマンド
 
 ```bash

@@ -19,9 +19,8 @@
 
 自動化された規約 (settings.json hooks):
 - PostToolUse — gofmt / golangci-lint / terraform fmt / tflint
-- Stop — go test / terraform validate gate
+- Stop — go.mod と Go がある場合に go test を実行し、テスト失敗を検出したら完了をブロック
 - PreToolUse — destructive command + tfstate edit guard
-- PreCompact — ADR / progress / git state preservation
 
 skill / agent カタログ:
 - Claude Code skill 一覧 → `~/.claude/skills/*/SKILL.md`

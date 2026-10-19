@@ -90,10 +90,16 @@ sh scripts/cleanup-retired-links.sh --apply
 sh scripts/cleanup-retired-links.sh
 ```
 
-最後の確認で `Matched links: 0` になれば掃除完了です。`SKIP` は削除せず残した対象です。
+最後の確認で `Matched links: 0` になれば、このスクリプトが自動削除できる対象は残っていません。
+`SKIP` は削除せず残した対象なので、表示された場合は個別に確認してください。
 対象は `golang-patterns`、`golang-testing`、`golang-build-fixing`、`iterative-retrieval`、`git-branching` のClaude/Codex用リンクと、`go-build-resolver`、`go-reviewer` のエージェント用リンクです。
 このチェックアウト内の削除済みパスを直接指す絶対パスのリンクだけを削除し、実ファイル・ディレクトリ・別のリンク先は保持します。相対パスや別チェックアウトを指すリンクは `SKIP` となるため、個別に確認してください。
-確認先を変更する場合は `--home-dir /path/to/home` を指定できます。
+確認先を変更する場合は `--home-dir /path/to/home` を指定できます。先に確認し、同じパスを指定して削除します。
+
+```bash
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home --apply
+```
 
 ## pstack plugin
 

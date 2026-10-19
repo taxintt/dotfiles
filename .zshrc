@@ -6,10 +6,6 @@ eval "$(`brew --prefix`/bin/mise activate zsh)"
 mise completion zsh > $(brew --prefix)/share/zsh/site-functions/_mise
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
-# signing commits
-# https://gist.github.com/repodevs/a18c7bb42b2ab293155aca889d447f1b
-export GPG_TTY=$(tty)
-
 # starship
 eval "$(starship init zsh)"
 

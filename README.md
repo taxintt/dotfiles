@@ -94,7 +94,8 @@ make link
 
 ### Codex
 
-Codex CLIのpluginコマンドで登録・導入します。
+`make link` で配置する `.codex/config.toml` にmarketplaceとpluginの有効化設定を含めています。
+plugin本体は別途インストールが必要です。未導入の環境では次のコマンドで登録・導入します。
 
 ```bash
 codex plugin marketplace add michael-denyer/pstack-claude

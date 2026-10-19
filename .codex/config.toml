@@ -23,3 +23,10 @@ writable_roots = [
 
 [tui]
 status_line = ["model-with-reasoning", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens"]
+
+[marketplaces.pstack-claude]
+source_type = "git"
+source = "https://github.com/michael-denyer/pstack-claude.git"
+
+[plugins."pstack@pstack-claude"]
+enabled = true

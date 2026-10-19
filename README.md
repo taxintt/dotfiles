@@ -80,6 +80,18 @@ make link
 [pstack](https://github.com/michael-denyer/pstack-claude)をClaude CodeとCodexで使用します。
 汎用的な開発タスクは `poteto-mode` を入口にし、必要なワークフローへ振り分けます。
 
+### 前提ツール
+
+PR監視の `watch-pr` とスタック管理の `orch` はBunを使用します。
+Bunは `.config/mise/config.toml` で管理します。`make brew` と `make link` の後にインストールしてください。
+
+```bash
+mise install bun
+mise exec -- bun --version
+```
+
+これらのスクリプトは初回実行時に依存パッケージを取得するため、ネットワークアクセスも必要です。
+
 ### Claude Code
 
 `make link` で配置する `.claude/settings.json` にmarketplaceとpluginの有効化設定を含めています。

@@ -20,7 +20,7 @@ Phase 1 完了前の修正提案・実装は禁止。
 - production / staging のバグ報告
 - 想定外の挙動 (silent failure 含む)
 - パフォーマンス問題 (latency / memory / CPU)
-- ビルド失敗 (Go なら `golang-build-fixing` を Phase 4 で併用)
+- ビルド失敗
 - integration 問題 (複数サービス間)
 - 過去 3 回以上同じ問題で修正失敗 — architecture 議論に切替
 
@@ -137,5 +137,4 @@ Pressure 下で出やすい言い訳と反論。
 
 - **`tdd-workflow`** + `regression-testing.md` — Phase 4 の失敗テスト先行 / 逆フェーズ検証
 - **`verification-before-completion`** — Phase 4 完了主張前の必須ゲート
-- **`golang-build-fixing`** — Go ビルドエラー時の Phase 4 修正手順を当該 skill に委譲
 - 上流参考: `obra/superpowers` の `systematic-debugging` skill

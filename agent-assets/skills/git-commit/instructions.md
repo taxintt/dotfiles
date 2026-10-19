@@ -1,6 +1,6 @@
 # Git Commit Skill
 
-変更を分析し、適切な粒度と「なぜ」を書くコミットメッセージで commit する。ブランチ作成は **スコープ外**（`git-branching` skill を使う）。
+変更を分析し、適切な粒度と「なぜ」を書くコミットメッセージで commit する。ブランチ作成は **スコープ外**（`git-workflow-chain` のブランチ作成規約を参照）。
 
 ## 発火タイミング
 
@@ -30,9 +30,9 @@
 
 ### ステップ 2: ブランチ判定（Iron Law）
 
-**main / master にいる場合: 即中断**。`git-branching` skill か `git-workflow-chain` skill の使用を促す。
+**main / master にいる場合: 即中断**。`git-workflow-chain` skill の使用を促す。
 
-ブランチ命名ルールは `git-branching` skill を参照。
+ブランチ命名ルールは `git-workflow-chain` の「ブランチ作成規約」を参照。
 
 ### ステップ 3: ステージング判定
 
@@ -119,13 +119,13 @@ EOF
 
 | Rationalization | 対処 |
 |---|---|
-| 「1 回だけ main に直接」 | 即中断。`git-branching` へ誘導 |
+| 「1 回だけ main に直接」 | 即中断。`git-workflow-chain` へ誘導 |
 | 「hook が遅いから --no-verify」 | 根本原因を直す。スキップしない |
 | 「前の commit に amend で足せば楽」 | 新コミットを作る |
 | 「.env は .gitignore 漏れだけど小さいから OK」 | 中断。rotate 必要かも |
 
 ## 関連
 
-- ブランチ作成: `git-branching` skill
+- ブランチ作成: `git-workflow-chain` の「ブランチ作成規約」
 - PR 作成: `git-pull-request` skill
 - 連鎖: `git-workflow-chain` skill

@@ -8,8 +8,8 @@ macOS 向けの個人設定ファイルです。
 | パス | 説明 |
 |---|---|
 | `.zshrc` `.gitconfig` `.tmux.conf` `.config/` | シェル、Git、ターミナルの設定 |
-| `.claude/skills/` | Claude Code のスキル（35件） |
-| `.claude/agents/` | サブエージェントの定義（8件） |
+| `.claude/skills/` | Claude Code のスキル（30件） |
+| `.claude/agents/` | サブエージェントの定義（6件） |
 | `.claude/hooks/` | PreToolUse、PostToolUse、Stop の各検証フック（5件） |
 | `.claude/settings.json` | 権限、サンドボックス、プラグインの設定 |
 | `.codex/` | Codex CLI の設定 |
@@ -73,6 +73,7 @@ make link
 
 各設定ファイルをホームディレクトリにシンボリックリンクします。
 同じ名前のファイルがすでにある場合は上書きします。
+削除されたスキル・エージェントを指す既存のホーム側シンボリックリンクは、リンク先を確認して手動で削除してください。`make link` は不要になったリンクを自動削除しません。
 
 ## その他のコマンド
 

@@ -1,6 +1,6 @@
 ---
 name: git-workflow-chain
-description: 変更から PR までを一気通貫で行うとき、ユーザーが「ブランチ切ってコミットして PR 作って」のように連鎖依頼したとき、または `/git-create-branch-commit-pr` として明示呼び出しされたときに起動する。`git-branching` → `git-commit` → `git-pull-request` を順次実行する composition skill。
+description: ブランチ作成だけを依頼されたとき、または変更からPRまでを一気通貫で行うとき、ブランチ作成後にgit-commit・git-pull-requestを順次実行する。`/git-create-branch-commit-pr` として明示呼び出しされたときも起動する。
 model: haiku
 ---
 

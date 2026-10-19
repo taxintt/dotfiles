@@ -1,6 +1,6 @@
 ---
 name: code-review-routing
-description: 未コミット変更に対する包括的レビュー。言語を検出して `code-reviewer` / `security-reviewer` agent または `golang-patterns` (Go) に振り分ける。`/code-review` として明示呼び出しされたときも起動する。
+description: 未コミット変更に対する包括的レビュー。変更言語に応じたチェックを適用し、`code-reviewer` / `security-reviewer` agent に振り分ける。`/code-review` として明示呼び出しされたときも起動する。
 model: sonnet
 ---
 
@@ -25,7 +25,7 @@ model: sonnet
    どちらも空なら「変更なし」と報告して終了。
 
 2. **言語分岐**
-   - `.go` を含む → `golang-patterns` skill の Review Workflow を起動（`/go-review` 相当）、`go-reviewer` agent に委譲
+   - `.go` を含む → 言語非依存項目とプロジェクトのGo規約を適用し、`code-reviewer` agent に委譲
    - `.ts` / `.tsx` / `.js` / `.jsx` 中心 → 下記チェックリストを適用、`code-reviewer` agent に委譲
    - `.py` / `.rb` 等 → 言語非依存項目のみ適用、`code-reviewer` agent に委譲
    - 複数言語混在 → 言語ごとに分割してそれぞれ適切経路へ
@@ -69,7 +69,7 @@ model: sonnet
 ## 対象
 - 変更ファイル: <path 1> / <path 2> / ...
 - 言語: <検出結果>
-- 委譲推奨: <code-reviewer / security-reviewer / golang-patterns 等>
+- 委譲推奨: <code-reviewer / security-reviewer>
 
 ## 重要度: CRITICAL
 - <path:line>
@@ -94,10 +94,8 @@ model: sonnet
 ## 禁止事項
 
 - 発生していない問題の推測報告
-- Go 固有チェック（race condition 深掘り等）を本 skill でやろうとしない → `golang-patterns` の Review Workflow に送る
 - ユーザー確認なしに `git commit` 等を勝手に実行
 
 ## 関連
 
-- Go 専用: `golang-patterns` skill の Review Workflow 節
 - Agents: `code-reviewer` / `security-reviewer`

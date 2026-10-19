@@ -98,7 +98,8 @@
     "codex@openai-codex": true,
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
-    "clickhouse-best-practices@claude-plugins-official": true
+    "clickhouse-best-practices@claude-plugins-official": true,
+    "pstack@pstack-claude": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -129,6 +130,12 @@
       "source": {
         "source": "github",
         "repo": "supabase/agent-skills"
+      }
+    },
+    "pstack-claude": {
+      "source": {
+        "source": "github",
+        "repo": "michael-denyer/pstack-claude"
       }
     }
   },

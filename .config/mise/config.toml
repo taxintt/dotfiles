@@ -12,6 +12,7 @@ tflint    = "latest"
 # [Node.js]
 node = "lts"
 pnpm = "latest"
+bun = "latest"
 
 # [Go]
 go = "latest"

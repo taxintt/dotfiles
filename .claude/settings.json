@@ -53,6 +53,11 @@
             "type": "command",
             "command": "$HOME/.claude/hooks/pre-tool-edit-guard.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/skills/strategic-compact/suggest-compact.sh",
+            "timeout": 5
           }
         ]
       }

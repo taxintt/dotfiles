@@ -32,9 +32,8 @@ skill / agent カタログ:
 - Codex への実装委譲 (Claude = orchestrator / Codex = implementer) → `codex-delegation` skill
 - Codex Goal mode での自走実装 + agmsg advisor 常駐 → `codex-goal-handoff` skill
 - Terraform 検証 → `terraform-validation` skill
-- Go 規約・ビルド・テスト → `golang-patterns` / `golang-testing` / `golang-build-fixing` skill
 - セキュリティ応答 → `security-reviewer` agent + 本ファイル「Security Guidelines」
-- リサーチ手法 → 本ファイル「Research Mode」 + `iterative-retrieval` / `obsidian-context` skill
+- リサーチ手法 → 本ファイル「Research Mode」 + `obsidian-context` skill
 - ADR → 各リポジトリの `docs/adr/`
 
 # Personal Patterns
@@ -67,7 +66,6 @@ Goal: understand before acting. Don't write code until the question is clear.
 
 ## Default tools
 - Explore agent — wide codebase sweeps
-- `iterative-retrieval` skill — narrow context for subagents
 - `obsidian-context` skill — pull from personal vault
 - Parallel Task agents — multi-angle analysis (security / perf / types)
 

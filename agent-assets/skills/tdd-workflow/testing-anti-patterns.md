@@ -152,4 +152,3 @@ it('does something', () => {
 - `instructions.md` — Iron Law と Rationalization Table
 - `regression-testing.md` — バグ修正時の逆フェーズ検証
 - `patterns-ts.md` — TS 具体パターン
-- `golang-testing` skill — Go specific

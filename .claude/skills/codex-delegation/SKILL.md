@@ -62,7 +62,7 @@ codex exec --sandbox workspace-write --cd <repo-root> "<prompt>"
 Codex による編集は Claude 側からは Bash 実行にしか見えず、`PostToolUse (Edit|Write)` の lint hook を**通らない**。したがって委譲後は必ず:
 
 1. `git diff --stat` + `git diff` で全変更をレビューする
-2. 言語別の lint / test を明示的に実行する (Go → `golang-build-fixing` / Terraform → `terraform-validation`)
+2. プロジェクトで定義された lint / test を明示的に実行する（Terraform → `terraform-validation`）。
 3. デバッグコード残置・ハードコードされたシークレットがないか `rg` で確認する
 
 これを省略して「Codex がやったので OK」とすることを禁止する。完了報告前は `verification-before-completion` skill の対象。

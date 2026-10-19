@@ -25,7 +25,7 @@ model: opus
 2. **`design-interview` skill を起動** — 次のいずれかに該当するとき: 複数コンポーネント / データ永続化 / 外部連携 / 妥当なアーキテクチャが複数ある。いずれにも該当しない小規模なら skip 可（skip したことと理由を明示する）
 3. **`implementation-planning` skill を起動** — 承認ホワイトリストに一致するまで実装しない
    - 数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡す。受け入れレビュー（同 skill Phase 6）完了後、ステップ 7 のデリバリーから再合流する
-4. **実装** — `tdd-workflow` skill。言語特化があれば委譲: Go → `golang-testing`、`*.tf` 編集後 → `terraform-validation`
+4. **実装** — `tdd-workflow` skill。`*.tf` 編集後 → `terraform-validation`
    - ユーザーが Codex 委譲を指示したときは本ステップを `codex-delegation` skill に置換する（ステップ 5-6 は省略しない）
 5. **レビュー** — `code-review-routing` skill。CRITICAL が残っていたら修正してから次へ
 6. **検証** — `verification-loop` skill を `pre-pr` モードで実行

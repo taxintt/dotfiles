@@ -14,5 +14,4 @@ model: sonnet
 ## 関連
 
 - **デバッグ起点**: `systematic-debugging` のPhase 4完了主張前に必ず本skillを発火
-- **Goビルド対象**: `golang-build-fixing` の出力をStep 3-4で確認
 - **コードレビュー対象**: `code-review-routing` 起動前に本skillのゲートを通す

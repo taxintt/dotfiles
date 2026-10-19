@@ -73,7 +73,32 @@ make link
 
 各設定ファイルをホームディレクトリにシンボリックリンクします。
 同じ名前のファイルがすでにある場合は上書きします。
-削除されたスキル・エージェントを指す既存のホーム側シンボリックリンクは、リンク先を確認して手動で削除してください。`make link` は不要になったリンクを自動削除しません。
+`make link` は不要になったリンクを自動削除しません。削除済みスキル・エージェントへの既存リンクは、次の手順で整理します。
+
+### 4. 削除済みスキル・エージェントへのリンクを掃除する
+
+まずリポジトリのルートで確認コマンドを実行します。この段階では削除しません。
+
+```bash
+sh scripts/cleanup-retired-links.sh
+```
+
+`CHECK` に表示されたリンク先を確認し、削除する場合は次を実行します。
+
+```bash
+sh scripts/cleanup-retired-links.sh --apply
+sh scripts/cleanup-retired-links.sh
+```
+
+最後の確認で `Matched links: 0` になれば、このスクリプトが自動削除できる対象は残っていません。
+`SKIP` は削除せず残した対象なので、表示された場合は個別に確認してください。
+このチェックアウト内の削除済みパスを直接指す絶対パスのリンクだけを削除し、実ファイル・ディレクトリ・別のリンク先は保持します。相対パスや別チェックアウトを指すリンクは `SKIP` となるため、個別に確認してください。
+確認先を変更する場合は `--home-dir /path/to/home` を指定できます。先に確認し、同じパスを指定して削除します。
+
+```bash
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home --apply
+```
 
 ## pstack plugin
 

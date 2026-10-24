@@ -99,7 +99,6 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "dig@kuu-marketplace": true,
-    "terraform-code-generation@hashicorp": true,
     "codex@openai-codex": true,
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
@@ -112,12 +111,6 @@
       "source": {
         "source": "github",
         "repo": "fumiya-kume/claude-code"
-      }
-    },
-    "hashicorp": {
-      "source": {
-        "source": "github",
-        "repo": "hashicorp/agent-skills"
       }
     },
     "openai-codex": {

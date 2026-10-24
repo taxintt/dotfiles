@@ -51,7 +51,7 @@ check_link() {
 	fi
 }
 
-for name in golang-patterns golang-testing golang-build-fixing iterative-retrieval git-branching; do
+for name in golang-patterns golang-testing golang-build-fixing iterative-retrieval git-branching terraform-validation; do
 	check_link ".claude/skills/$name" ".claude/skills/$name"
 	check_link ".agents/skills/$name" "agent-assets/skills/$name"
 done

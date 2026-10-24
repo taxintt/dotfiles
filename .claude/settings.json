@@ -113,12 +113,6 @@
         "repo": "fumiya-kume/claude-code"
       }
     },
-    "hashicorp": {
-      "source": {
-        "source": "github",
-        "repo": "hashicorp/agent-skills"
-      }
-    },
     "openai-codex": {
       "source": {
         "source": "github",

@@ -8,8 +8,8 @@ macOS 向けの個人設定ファイルです。
 | パス | 説明 |
 |---|---|
 | `.zshrc` `.gitconfig` `.tmux.conf` `.config/` | シェル、Git、ターミナルの設定 |
-| `.claude/skills/` | Claude Code のスキル（35件） |
-| `.claude/agents/` | サブエージェントの定義（8件） |
+| `.claude/skills/` | Claude Code のスキル（30件） |
+| `.claude/agents/` | サブエージェントの定義（6件） |
 | `.claude/hooks/` | PreToolUse、PostToolUse、Stop の各検証フック（5件） |
 | `.claude/settings.json` | 権限、サンドボックス、プラグインの設定 |
 | `.codex/` | Codex CLI の設定 |
@@ -73,6 +73,81 @@ make link
 
 各設定ファイルをホームディレクトリにシンボリックリンクします。
 同じ名前のファイルがすでにある場合は上書きします。
+`make link` は不要になったリンクを自動削除しません。削除済みスキル・エージェントへの既存リンクは、次の手順で整理します。
+
+### 4. 削除済みスキル・エージェントへのリンクを掃除する
+
+まずリポジトリのルートで確認コマンドを実行します。この段階では削除しません。
+
+```bash
+sh scripts/cleanup-retired-links.sh
+```
+
+`CHECK` に表示されたリンク先を確認し、削除する場合は次を実行します。
+
+```bash
+sh scripts/cleanup-retired-links.sh --apply
+sh scripts/cleanup-retired-links.sh
+```
+
+最後の確認で `Matched links: 0` になれば、このスクリプトが自動削除できる対象は残っていません。
+`SKIP` は削除せず残した対象なので、表示された場合は個別に確認してください。
+このチェックアウト内の削除済みパスを直接指す絶対パスのリンクだけを削除し、実ファイル・ディレクトリ・別のリンク先は保持します。相対パスや別チェックアウトを指すリンクは `SKIP` となるため、個別に確認してください。
+確認先を変更する場合は `--home-dir /path/to/home` を指定できます。先に確認し、同じパスを指定して削除します。
+
+```bash
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home
+sh scripts/cleanup-retired-links.sh --home-dir /path/to/home --apply
+```
+
+## pstack plugin
+
+[pstack](https://github.com/michael-denyer/pstack-claude)をClaude CodeとCodexで使用します。
+汎用的な開発タスクは `poteto-mode` を入口にし、必要なワークフローへ振り分けます。
+
+### 前提ツール
+
+PR監視の `watch-pr` とスタック管理の `orch` はBunを使用します。
+Bunは `.config/mise/config.toml` で管理します。`make brew` と `make link` の後にインストールしてください。
+
+```bash
+mise install bun
+mise exec -- bun --version
+```
+
+これらのスクリプトは初回実行時に依存パッケージを取得するため、ネットワークアクセスも必要です。
+
+### Claude Code
+
+`make link` で配置する `.claude/settings.json` にmarketplaceとpluginの有効化設定を含めています。
+新しいセッションで `/plugin` からインストール状態を確認し、未導入なら次を実行します。
+
+```text
+/plugin marketplace add michael-denyer/pstack-claude
+/plugin install pstack@pstack-claude
+```
+
+`/pstack:poteto-mode` で呼び出せます。初期設定や自動ルーティングの変更は `/pstack:setup-pstack` を使用します。
+
+### Codex
+
+`make link` で配置する `.codex/config.toml` にmarketplaceとpluginの有効化設定を含めています。
+plugin本体は別途インストールが必要です。未導入の環境では次のコマンドで登録・導入します。
+
+```bash
+codex plugin marketplace add michael-denyer/pstack-claude
+codex plugin add pstack@pstack-claude
+```
+
+新しいセッションでpluginの読み込みを確認し、`/hooks` でpstackのSessionStart hookを確認・信頼すると自動ルーティングが有効になります。
+hookの定義が更新された場合は再確認が必要です。`poteto-mode` を名前で指定して呼び出すこともできます。
+並列エージェントを使うため、管理対象の `.codex/config.toml` で `multi_agent` を有効にしています。
+
+### 動作確認
+
+Claude CodeとCodexの両方で `poteto-mode` を明示し、読み取り専用のリポジトリ調査を依頼して、スキルが読み込まれることを確認します。
+自動ルーティングは新しいセッションで複数工程の調査を依頼して確認します。
+pluginの登録・インストールだけでは、セッションでの読み込みやhookの実行確認は完了しません。
 
 ## その他のコマンド
 

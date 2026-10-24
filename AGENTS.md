@@ -19,9 +19,8 @@
 
 自動化された規約 (settings.json hooks):
 - PostToolUse — gofmt / golangci-lint / terraform fmt / tflint
-- Stop — go test / terraform validate gate
+- Stop — go.mod と Go がある場合に go test を実行し、テスト失敗を検出したら完了をブロック
 - PreToolUse — destructive command + tfstate edit guard
-- PreCompact — ADR / progress / git state preservation
 
 skill / agent カタログ:
 - Claude Code skill 一覧 → `~/.claude/skills/*/SKILL.md`
@@ -32,9 +31,8 @@ skill / agent カタログ:
 - Codex への実装委譲 (Claude = orchestrator / Codex = implementer) → `codex-delegation` skill
 - Codex Goal mode での自走実装 + agmsg advisor 常駐 → `codex-goal-handoff` skill
 - Terraform 検証 → `terraform-validation` skill
-- Go 規約・ビルド・テスト → `golang-patterns` / `golang-testing` / `golang-build-fixing` skill
 - セキュリティ応答 → `security-reviewer` agent + 本ファイル「Security Guidelines」
-- リサーチ手法 → 本ファイル「Research Mode」 + `iterative-retrieval` / `obsidian-context` skill
+- リサーチ手法 → 本ファイル「Research Mode」 + `obsidian-context` skill
 - ADR → 各リポジトリの `docs/adr/`
 
 # Personal Patterns
@@ -67,7 +65,6 @@ Goal: understand before acting. Don't write code until the question is clear.
 
 ## Default tools
 - Explore agent — wide codebase sweeps
-- `iterative-retrieval` skill — narrow context for subagents
 - `obsidian-context` skill — pull from personal vault
 - Parallel Task agents — multi-angle analysis (security / perf / types)
 

@@ -26,7 +26,7 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
    - バグ報告 → `systematic-debugging` skill（Phase 1-3 で原因特定後、Phase 4 から実装へ）
    - 機能・改善 → `implementation-planning` skill（承認ホワイトリストに一致するまで実装しない）
    - 機能・改善経路で数時間〜日単位の自走実装を指示されたときは、承認済み計画を `codex-goal-handoff` skill に渡し、受け入れレビュー（同 skill Phase 6）完了後にステップ 6 から再合流する。バグ経路では `systematic-debugging` に承認ゲートがないため、原因特定後に `implementation-planning` で計画化・承認を経てから渡す
-3. **実装** — `tdd-workflow` skill。言語特化があれば委譲: Go → `golang-testing`、`*.tf` 編集後 → `terraform-validation`
+3. **実装** — `tdd-workflow` skill。`*.tf` 編集後 → `terraform-validation`
    - ユーザーが Codex 委譲を指示したときは本ステップを `codex-delegation` skill に置換する（ステップ 4-5 は省略しない）
 4. **レビュー** — `code-review-routing` skill。CRITICAL が残っていたら修正してから次へ
 5. **検証** — `verification-loop` skill を `pre-pr` モードで実行
@@ -59,7 +59,7 @@ issue の調査だけ・実装だけなら該当する個別 skill を使う。�
 ## 関連
 
 - 計画: `implementation-planning` / `systematic-debugging`
-- 実装: `tdd-workflow`（Go: `golang-testing` / Terraform: `terraform-validation`）
+- 実装: `tdd-workflow`（Terraform: `terraform-validation`）
 - Codex 委譲: `codex-delegation`（同期・小タスク）/ `codex-goal-handoff`（長時間自走）
 - レビューと検証: `code-review-routing` / `verification-loop`
 - デリバリー: `git-workflow-chain`

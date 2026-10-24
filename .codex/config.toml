@@ -11,6 +11,7 @@ sandbox_mode = "workspace-write"
 # Goal mode (`/goal`) — ChatGPT 認証モードでのみ動作する
 [features]
 goals = true
+multi_agent = true
 
 [sandbox_workspace_write]
 network_access = false
@@ -22,3 +23,12 @@ writable_roots = [
 
 [tui]
 status_line = ["model-with-reasoning", "context-used", "used-tokens", "total-input-tokens", "total-output-tokens"]
+
+[marketplaces.pstack-claude]
+last_updated = "2026-10-19T13:58:53Z"
+last_revision = "3cff27a2dda8ab0390e3db55f4190539c5b86759"
+source_type = "git"
+source = "https://github.com/michael-denyer/pstack-claude.git"
+
+[plugins."pstack@pstack-claude"]
+enabled = true

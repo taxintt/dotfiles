@@ -12,6 +12,5 @@ Claude Codeでは共通本文の「自ら計画を作成する」の代わりに
 
 ## 関連
 
-- ビルド修復: `golang-build-fixing`（Goプロジェクトでビルドが失敗したとき）
 - レビュー: `code-review-routing`
 - 連鎖: `issue-to-pr-chain` / `idea-to-pr-chain` skill

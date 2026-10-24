@@ -77,7 +77,7 @@ EOF
 
 ## 関連
 
-- ブランチ作成: `git-branching` skill
+- ブランチ作成: `git-workflow-chain` の「ブランチ作成規約」
 - コミット: `git-commit` skill
 - 連鎖: `git-workflow-chain` skill
 - 検証: `verification-loop` skill（PR 前の `pre-pr` モード）

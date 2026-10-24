@@ -83,4 +83,4 @@
 ## 連携 skill
 
 - 承認後の実装: `tdd-workflow`
-- レビュー: `golang-patterns` の Review Workflow
+- レビュー: プロジェクトの規約と既存の検証手順に従う

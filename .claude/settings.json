@@ -53,6 +53,11 @@
             "type": "command",
             "command": "$HOME/.claude/hooks/pre-tool-edit-guard.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/skills/strategic-compact/suggest-compact.sh",
+            "timeout": 5
           }
         ]
       }
@@ -99,6 +104,7 @@
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
     "clickhouse-best-practices@claude-plugins-official": true,
+    "pstack@pstack-claude": true,
     "explainer@explainer": true
   },
   "extraKnownMarketplaces": {
@@ -130,6 +136,12 @@
       "source": {
         "source": "github",
         "repo": "supabase/agent-skills"
+      }
+    },
+    "pstack-claude": {
+      "source": {
+        "source": "github",
+        "repo": "michael-denyer/pstack-claude"
       }
     },
     "explainer": {

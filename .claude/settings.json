@@ -104,7 +104,8 @@
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
     "clickhouse-best-practices@claude-plugins-official": true,
-    "pstack@pstack-claude": true
+    "pstack@pstack-claude": true,
+    "explainer@explainer": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -141,6 +142,12 @@
       "source": {
         "source": "github",
         "repo": "michael-denyer/pstack-claude"
+      }
+    },
+    "explainer": {
+      "source": {
+        "source": "github",
+        "repo": "mizchi/explainer"
       }
     }
   },

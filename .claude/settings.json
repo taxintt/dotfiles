@@ -104,7 +104,9 @@
     "postgres-best-practices@supabase-agent-skills": true,
     "clickhouse-best-practices@claude-plugins-official": true,
     "pstack@pstack-claude": true,
-    "explainer@explainer": true
+    "explainer@explainer": true,
+    "claude-md-management@claude-plugins-official": true,
+    "claude-security@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "kuu-marketplace": {
@@ -154,7 +156,12 @@
         "api.github.com",
         "*.githubusercontent.com"
       ],
-      "allowLocalBinding": true
+      "allowLocalBinding": true,
+      "allowMachLookup": [
+        "com.apple.CoreAuthentication.agent",
+        "com.apple.CoreAuthentication.agent.libxpc",
+        "com.apple.ctkd.token-client"
+      ]
     },
     "enableWeakerNetworkIsolation": true
   },

@@ -192,7 +192,8 @@ cwt() {
     echo "usage: cwt <branch> [claude|codex]" >&2
     return 1
   fi
-  root=$(git rev-parse --show-toplevel) || return 1
+  root=$(git rev-parse --path-format=absolute --git-common-dir) || return 1
+  root=$(dirname "$root")
   dir="$root/.worktrees/$branch"
   if git -C "$root" show-ref --verify --quiet "refs/heads/$branch"; then
     git -C "$root" worktree add "$dir" "$branch" || return 1

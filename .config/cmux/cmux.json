@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "sidebar": {
+    // エージェントの状態 (Needs input / Running / Error) を行頭グリフ 1 つに集約
+    "compactAgentStatus": true
+  },
+  "notifications": {
+    // 同じワークスペース内の別ペイン宛てバナーを、そのペインにフォーカスするまで残す
+    "suppressOnlyFocusedSurface": true
+  },
+  "automation": {
+    // Claude Code / Codex の会話内容からワークスペース名・タブ名を自動生成 (手動 rename は上書きしない)
+    "workspaceAutoNaming": true
+  }
+}

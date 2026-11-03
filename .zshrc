@@ -184,6 +184,24 @@ codex-usage-watch() {
   done
 }
 
+## cmux: git worktree を作成し、新しい cmux ワークスペースでエージェントを起動する
+# usage: cwt <branch> [claude|codex]
+cwt() {
+  local branch="$1" agent="${2:-claude}" root dir
+  if [[ -z "$branch" ]]; then
+    echo "usage: cwt <branch> [claude|codex]" >&2
+    return 1
+  fi
+  root=$(git rev-parse --show-toplevel) || return 1
+  dir="$root/.worktrees/$branch"
+  if git -C "$root" show-ref --verify --quiet "refs/heads/$branch"; then
+    git -C "$root" worktree add "$dir" "$branch" || return 1
+  else
+    git -C "$root" worktree add -b "$branch" "$dir" || return 1
+  fi
+  cmux new-workspace --name "$branch" --cwd "$dir" --command "$agent" --focus true
+}
+
 ## difit
 alias difit="npx difit"
 

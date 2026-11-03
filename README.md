@@ -102,7 +102,8 @@ sh scripts/cleanup-retired-links.sh --home-dir /path/to/home --apply
 
 ## pstack plugin
 
-[pstack](https://github.com/michael-denyer/pstack-claude)をClaude CodeとCodexで使用します。
+pstackをClaude CodeとCodexで使用します。
+Claude Codeは公式の[cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack)、Codexは[michael-denyer/pstack-claude](https://github.com/michael-denyer/pstack-claude)を使用します。
 汎用的な開発タスクは `poteto-mode` を入口にし、必要なワークフローへ振り分けます。
 
 ### 前提ツール
@@ -123,9 +124,11 @@ mise exec -- bun --version
 新しいセッションで `/plugin` からインストール状態を確認し、未導入なら次を実行します。
 
 ```text
-/plugin marketplace add michael-denyer/pstack-claude
-/plugin install pstack@pstack-claude
+/plugin marketplace add cursor/plugins
+/plugin install pstack@cursor-plugins
 ```
+
+third-party marketplaceは自動更新が無効です。`/plugin` の marketplaces タブで `cursor-plugins` の auto-update を有効にするか、`claude plugin update pstack@cursor-plugins` で手動更新します。
 
 `/pstack:poteto-mode` で呼び出せます。初期設定や自動ルーティングの変更は `/pstack:setup-pstack` を使用します。
 

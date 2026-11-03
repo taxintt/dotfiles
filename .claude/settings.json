@@ -103,7 +103,7 @@
     "compact-plus@compact-plus-local": true,
     "postgres-best-practices@supabase-agent-skills": true,
     "clickhouse-best-practices@claude-plugins-official": true,
-    "pstack@pstack-claude": true,
+    "pstack@cursor-plugins": true,
     "explainer@explainer": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-security@anthropic-plugin-directory": true
@@ -133,10 +133,10 @@
         "repo": "supabase/agent-skills"
       }
     },
-    "pstack-claude": {
+    "cursor-plugins": {
       "source": {
         "source": "github",
-        "repo": "michael-denyer/pstack-claude"
+        "repo": "cursor/plugins"
       }
     },
     "explainer": {
